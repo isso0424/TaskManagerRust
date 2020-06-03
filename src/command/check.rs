@@ -2,7 +2,21 @@ use crate::command::types::{label::Labels, task::Tasks};
 use chrono::{Local, TimeZone};
 
 fn check_label() -> Result<(), String> {
-    let labels = Labels::load().map_err(|err| return err.to_string());
+    let labels = Labels::load().map_err(|err| return err.to_string())?;
+
+    let all_label_notifies = "".to_string();
+
+    for label in labels.content {
+        all_label_notifies = all_label_notifies + label.title.as_str() + "\n";
+    }
+
+    let notification_message = format!(
+        "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",
+        all_label_notifies
+    );
+
+    print!("{}", notification_message);
+
     Ok(())
 }
 
@@ -43,6 +57,8 @@ fn check_task() -> Result<(), String> {
         all_task_notifies
     );
 
+    println!("{}", notification_message);
+
     Ok(())
 }
 
@@ -51,10 +67,10 @@ fn check(args: Vec<String>) -> Result<(), String> {
 
     match target.as_str() {
         "label" => {
-            check_label();
+            check_label()?;
         }
         "task" => {
-            check_task();
+            check_task()?;
         }
     }
     Ok(())
