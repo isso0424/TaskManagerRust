@@ -26,7 +26,7 @@ fn create_label(title: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
+fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Result<(), String> {
     let mut tasks = match Tasks::load() {
         Ok(tasks) => tasks,
         Err(err) => return Err(err.to_string()),

@@ -86,7 +86,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
         "create" => {
             command::create::create(args)?;
         }
-        "check" => print!("check"),
+        "check" => command::check::check(args)?,
         "delete" => print!("delete"),
         "done" => print!("done"),
         "update" => print!("update"),

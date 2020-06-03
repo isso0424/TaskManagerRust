@@ -2,7 +2,7 @@ use chrono::offset::Local;
 use chrono::TimeZone;
 use std::convert::TryInto;
 
-pub fn get_limit(args: &Vec<String>) -> Option<u64> {
+pub fn get_limit(args: &Vec<String>) -> Option<i64> {
     if let Some(index) = args.iter().position(|arg| arg == "--limit") {
         if args.len() == index + 1 {
             return None;
@@ -16,7 +16,7 @@ pub fn get_limit(args: &Vec<String>) -> Option<u64> {
         if date_time.is_none() {
             return None;
         }
-        return date_time?.timestamp().try_into().ok();
+        return Some(date_time?.timestamp());
     }
     return None;
 }
