@@ -1,4 +1,8 @@
 use std::env;
+#[macro_use]
+extern crate log;
+
+mod command;
 
 fn load_args() -> Result<Vec<String>, String> {
     let not_enough_args: String = "Not enough args".to_owned();
@@ -43,6 +47,37 @@ fn load_args() -> Result<Vec<String>, String> {
     Ok(args)
 }
 
+fn execute(args: Vec<String>) -> Result<(), String> {
+    let command_name = &args[1];
+
+    match command_name.as_str() {
+        "create" => {
+            print!("create");
+            command::create::create_task();
+        }
+        "check" => print!("check"),
+        "delete" => print!("delete"),
+        "done" => print!("done"),
+        "update" => print!("update"),
+        _ => {
+            error!("Command not found");
+            return Err("UNKNOWN ERROR".to_owned());
+        }
+    }
+
+    Ok(())
+}
+
 fn main() {
-    let args = load_args();
+    let args = match load_args() {
+        Ok(arg) => arg,
+        Err(error) => {
+            error!("{}", error);
+            std::process::exit(1);
+        }
+    };
+    match execute(args) {
+        Ok(_) => print!("ok"),
+        Err(error) => print!("{}", error),
+    }
 }
