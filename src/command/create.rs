@@ -1,18 +1,30 @@
-use chrono::offset::Local;
-use chrono::DateTime;
-use chrono::TimeZone;
-
+use std::convert::TryInto;
+use std::env::current_exe;
 use std::fs::File;
+use std::path::PathBuf;
+
+use chrono::offset::Local;
+use chrono::Date;
+use chrono::TimeZone;
 
 use crate::command::types::{label::Label, task::Task};
 
-fn load_json() {}
+fn load_task_json() -> Result<(), std::io::Error> {
+    let dir_path = current_exe()?;
+    dir_path.push("task.json");
 
-fn create_task(
-    title: &str,
-    label: Option<Vec<&str>>,
-    limit: Option<DateTime<Local>>,
-) -> Result<(), String> {
+    let file = if dir_path.exists() {
+        File::open(dir_path)
+    } else {
+        File::create(dir_path)
+    };
+
+    let tasks_json: Vec<Task> = serde_json::from_reader(file)?;
+
+    Ok(())
+}
+
+fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
     Ok(())
 }
 
@@ -31,13 +43,17 @@ fn get_label<'a>(args: &'a Vec<String>) -> Option<Vec<&'a str>> {
     return None;
 }
 
-fn get_limit(args: &Vec<String>) -> Option<DateTime<Local>> {
+fn get_limit(args: &Vec<String>) -> Option<u64> {
     if let Some(index) = args.iter().position(|arg| arg == "--limit") {
         if args.len() == index + 1 {
             return None;
         }
         let raw_date_time = &args[index + 1];
-        return Local.datetime_from_str(raw_date_time, "%Y-%m-%d").ok();
+        let date_time = Local.datetime_from_str(raw_date_time, "%Y-%m-%d").ok();
+        if date_time.is_none() {
+            return None;
+        }
+        return date_time?.timestamp().try_into().ok();
     }
     return None;
 }

@@ -1,6 +1,10 @@
-use chrono::DateTime;
+use serde::{Deserialize, Serialize};
+
+use crate::command::types::label::Label;
+
+#[derive(Serialize, Deserialize)]
 pub struct Task {
     title: String,
     label: Vec<Label>,
-    limit: DateTime,
+    limit: u64,
 }
