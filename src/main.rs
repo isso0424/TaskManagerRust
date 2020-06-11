@@ -52,8 +52,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
 
     match command_name.as_str() {
         "create" => {
-            print!("create");
-            command::create::create_task();
+            command::create::create(args);
         }
         "check" => print!("check"),
         "delete" => print!("delete"),
