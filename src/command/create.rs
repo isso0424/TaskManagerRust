@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::env::current_exe;
 use std::fs::File;
+use std::io::BufWriter;
 use std::path::PathBuf;
 
 use chrono::offset::Local;
@@ -9,19 +10,15 @@ use chrono::TimeZone;
 
 use crate::command::types::{label::Label, task::Task};
 
-fn load_task_json() -> Result<(), std::io::Error> {
-    let dir_path = current_exe()?;
+fn load_task_json() -> Result<Vec<Task>, std::io::Error> {
+    let dir_path = &mut current_exe()?;
     dir_path.push("task.json");
 
-    let file = if dir_path.exists() {
-        File::open(dir_path)
-    } else {
-        File::create(dir_path)
-    };
+    let file = File::open(dir_path)?;
 
     let tasks_json: Vec<Task> = serde_json::from_reader(file)?;
 
-    Ok(())
+    Ok(tasks_json)
 }
 
 fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
