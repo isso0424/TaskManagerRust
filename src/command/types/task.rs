@@ -5,6 +5,11 @@ use crate::command::types::label::Label;
 #[derive(Serialize, Deserialize)]
 pub struct Task {
     title: String,
-    label: Vec<Label>,
-    limit: u64,
+    label: Option<Vec<Label>>,
+    limit: Option<u64>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Tasks {
+    pub content: Vec<Task>,
 }

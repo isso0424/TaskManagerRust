@@ -8,24 +8,85 @@ use chrono::offset::Local;
 use chrono::Date;
 use chrono::TimeZone;
 
-use crate::command::types::{label::Label, task::Task};
+use crate::command::types::{
+    label::{Label, Labels},
+    task::{Task, Tasks},
+};
 
-fn load_task_json() -> Result<Vec<Task>, std::io::Error> {
+fn load_task_json() -> Result<Tasks, std::io::Error> {
     let dir_path = &mut current_exe()?;
-    dir_path.push("task.json");
+    dir_path.push("tasks.json");
 
     let file = File::open(dir_path)?;
 
-    let tasks_json: Vec<Task> = serde_json::from_reader(file)?;
+    let tasks_json = serde_json::from_reader(file)?;
 
     Ok(tasks_json)
 }
 
+fn load_label_json() -> Result<Labels, std::io::Error> {
+    let dir_path = &mut current_exe()?;
+    dir_path.push("labels.json");
+
+    let file = File::open(dir_path)?;
+
+    let label_json = serde_json::from_reader(file)?;
+
+    Ok(label_json)
+}
+
+fn save_task_json(prev_tasks: &mut Tasks, new_task: Task) -> Result<(), std::io::Error> {
+    prev_tasks.content.push(new_task);
+
+    Ok(())
+}
+
+fn parse_to_label(raw_labels: Option<Vec<&str>>) -> Result<Option<Vec<Label>>, String> {
+    let labels: Vec<Label>;
+    if raw_labels.is_none() {
+        return Ok(None);
+    }
+    let all_labels = &load_label_json().map_err(|err| return err.to_string());
+    for raw_label in match raw_labels {
+        Some(value) => value,
+        None => return Ok(None),
+    } {
+        if !all_labels?
+            .content
+            .iter()
+            .any(|label| label.title.to_string() == raw_label)
+        {
+            continue;
+        }
+        labels.push(Label {
+            title: raw_label.to_string(),
+        });
+    }
+
+    Ok(Some(labels))
+}
+
 fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
+    let tasks = match load_task_json() {
+        Ok(tasks) => tasks,
+        Err(err) => return Err(err.to_string()),
+    };
+
+    let new_task = Task {
+        title: title.to_string(),
+        label: parse_to_label(label)?,
+        limit: limit,
+    };
+
     Ok(())
 }
 
 fn create_label(title: &str) -> Result<(), String> {
+    let labels = match load_label_json() {
+        Ok(labels) => labels,
+        Err(err) => return Err(err.to_string()),
+    };
+
     Ok(())
 }
 
