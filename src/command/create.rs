@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::env::current_exe;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::path::PathBuf;
 
@@ -35,23 +36,30 @@ fn load_label_json() -> Result<Labels, std::io::Error> {
     Ok(label_json)
 }
 
-fn save_task_json(prev_tasks: &mut Tasks, new_task: Task) -> Result<(), std::io::Error> {
-    prev_tasks.content.push(new_task);
+fn save_task_json(tasks_vec: Vec<Task>) -> Result<(), std::io::Error> {
+    let dir_path = &mut current_exe()?;
+    dir_path.push("tasks.json");
+
+    let tasks = Tasks { content: tasks_vec };
+
+    let json = serde_json::to_string(&tasks)?;
+
+    let file = OpenOptions::new().write(true).truncate(true).open(dir_path);
 
     Ok(())
 }
 
 fn parse_to_label(raw_labels: Option<Vec<&str>>) -> Result<Option<Vec<Label>>, String> {
-    let labels: Vec<Label>;
+    let labels = &mut vec![];
     if raw_labels.is_none() {
         return Ok(None);
     }
-    let all_labels = &load_label_json().map_err(|err| return err.to_string());
+    let all_labels = &load_label_json().map_err(|err| return err.to_string())?;
     for raw_label in match raw_labels {
         Some(value) => value,
         None => return Ok(None),
     } {
-        if !all_labels?
+        if !all_labels
             .content
             .iter()
             .any(|label| label.title.to_string() == raw_label)
@@ -63,7 +71,7 @@ fn parse_to_label(raw_labels: Option<Vec<&str>>) -> Result<Option<Vec<Label>>, S
         });
     }
 
-    Ok(Some(labels))
+    Ok(Some(labels.clone()))
 }
 
 fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
@@ -77,6 +85,9 @@ fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Res
         label: parse_to_label(label)?,
         limit: limit,
     };
+    let task_vec = &mut tasks.content.clone();
+
+    task_vec.push(new_task);
 
     Ok(())
 }
