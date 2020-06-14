@@ -3,16 +3,76 @@ use std::env::current_exe;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::BufWriter;
+use std::io::Write;
 use std::path::PathBuf;
 
 use chrono::offset::Local;
-use chrono::Date;
 use chrono::TimeZone;
 
 use crate::command::types::{
     label::{Label, Labels},
     task::{Task, Tasks},
 };
+
+fn save(json: String, dir_path: PathBuf) -> Result<(), std::io::Error> {
+    let file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(dir_path)?;
+
+    let mut writer = BufWriter::new(file);
+
+    write!(writer, "{}", json)?;
+
+    Ok(())
+}
+
+fn load_label_json() -> Result<Labels, std::io::Error> {
+    let mut dir_path = current_exe()?;
+    dir_path.push("labels.json");
+
+    let file = File::open(dir_path)?;
+
+    let label_json = serde_json::from_reader(file)?;
+
+    Ok(label_json)
+}
+
+fn save_label_json(labels_vec: Vec<Label>) -> Result<(), std::io::Error> {
+    let mut dir_path = current_exe()?;
+    dir_path.push("labels.json");
+
+    let labels = Labels {
+        content: labels_vec,
+    };
+
+    let json = serde_json::to_string(&labels)?;
+
+    save(json, dir_path)?;
+
+    Ok(())
+}
+
+fn create_label(title: &str) -> Result<(), String> {
+    let mut labels = match load_label_json() {
+        Ok(labels) => labels,
+        Err(err) => return Err(err.to_string()),
+    };
+
+    if labels.content.iter().any(|x| x.title == title) {
+        return Err("Cannot use duplicate label title".to_string());
+    }
+
+    let new_label = Label {
+        title: title.to_string(),
+    };
+
+    labels.content.push(new_label);
+
+    save_label_json(labels.content).map_err(|err| return err.to_string())?;
+
+    Ok(())
+}
 
 fn load_task_json() -> Result<Tasks, std::io::Error> {
     let dir_path = &mut current_exe()?;
@@ -25,26 +85,15 @@ fn load_task_json() -> Result<Tasks, std::io::Error> {
     Ok(tasks_json)
 }
 
-fn load_label_json() -> Result<Labels, std::io::Error> {
-    let dir_path = &mut current_exe()?;
-    dir_path.push("labels.json");
-
-    let file = File::open(dir_path)?;
-
-    let label_json = serde_json::from_reader(file)?;
-
-    Ok(label_json)
-}
-
 fn save_task_json(tasks_vec: Vec<Task>) -> Result<(), std::io::Error> {
-    let dir_path = &mut current_exe()?;
+    let mut dir_path = current_exe()?;
     dir_path.push("tasks.json");
 
     let tasks = Tasks { content: tasks_vec };
 
     let json = serde_json::to_string(&tasks)?;
 
-    let file = OpenOptions::new().write(true).truncate(true).open(dir_path);
+    save(json, dir_path)?;
 
     Ok(())
 }
@@ -75,28 +124,24 @@ fn parse_to_label(raw_labels: Option<Vec<&str>>) -> Result<Option<Vec<Label>>, S
 }
 
 fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<u64>) -> Result<(), String> {
-    let tasks = match load_task_json() {
+    let mut tasks = match load_task_json() {
         Ok(tasks) => tasks,
         Err(err) => return Err(err.to_string()),
     };
+
+    if tasks.content.iter().any(|x| x.title == title) {
+        return Err("Cannot use duplicate task title".to_string());
+    }
 
     let new_task = Task {
         title: title.to_string(),
         label: parse_to_label(label)?,
         limit: limit,
     };
-    let task_vec = &mut tasks.content.clone();
 
-    task_vec.push(new_task);
+    tasks.content.push(new_task);
 
-    Ok(())
-}
-
-fn create_label(title: &str) -> Result<(), String> {
-    let labels = match load_label_json() {
-        Ok(labels) => labels,
-        Err(err) => return Err(err.to_string()),
-    };
+    let _ = save_task_json(tasks.content).map_err(|err| return err.to_string())?;
 
     Ok(())
 }
