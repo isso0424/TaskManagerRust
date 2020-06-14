@@ -28,8 +28,7 @@ fn save(json: String, dir_path: PathBuf) -> Result<(), std::io::Error> {
 }
 
 fn load_label_json() -> Result<Labels, std::io::Error> {
-    let mut dir_path = current_exe()?;
-    dir_path.push("labels.json");
+    let dir_path = current_exe()?.parent().unwrap().join("labels.json");
 
     let file = File::open(dir_path)?;
 
@@ -39,8 +38,7 @@ fn load_label_json() -> Result<Labels, std::io::Error> {
 }
 
 fn save_label_json(labels_vec: Vec<Label>) -> Result<(), std::io::Error> {
-    let mut dir_path = current_exe()?;
-    dir_path.push("labels.json");
+    let dir_path = current_exe()?.parent().unwrap().join("labels.json");
 
     let labels = Labels {
         content: labels_vec,
@@ -75,8 +73,7 @@ fn create_label(title: &str) -> Result<(), String> {
 }
 
 fn load_task_json() -> Result<Tasks, std::io::Error> {
-    let dir_path = &mut current_exe()?;
-    dir_path.push("tasks.json");
+    let dir_path = current_exe()?.parent().unwrap().join("tasks.json");
 
     let file = File::open(dir_path)?;
 
@@ -86,8 +83,7 @@ fn load_task_json() -> Result<Tasks, std::io::Error> {
 }
 
 fn save_task_json(tasks_vec: Vec<Task>) -> Result<(), std::io::Error> {
-    let mut dir_path = current_exe()?;
-    dir_path.push("tasks.json");
+    let dir_path = current_exe()?.parent().unwrap().join("tasks.json");
 
     let tasks = Tasks { content: tasks_vec };
 
@@ -163,7 +159,11 @@ fn get_limit(args: &Vec<String>) -> Option<u64> {
             return None;
         }
         let raw_date_time = &args[index + 1];
-        let date_time = Local.datetime_from_str(raw_date_time, "%Y-%m-%d").ok();
+        print!("{}", raw_date_time);
+        let date_time = Local
+            .datetime_from_str(format!("{} 00:00", raw_date_time).as_str(), "%F %R")
+            .ok();
+        print!("{:?}", date_time);
         if date_time.is_none() {
             return None;
         }

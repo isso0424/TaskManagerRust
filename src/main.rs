@@ -55,8 +55,7 @@ fn load_args() -> Result<Vec<String>, String> {
 }
 
 fn create_json() -> Result<(), std::io::Error> {
-    let task_dir_path = &mut current_exe()?;
-    task_dir_path.push("task.json");
+    let task_dir_path = current_exe()?.parent().unwrap().join("tasks.json");
 
     if !task_dir_path.is_file() {
         let file = File::create(task_dir_path)?;
@@ -66,8 +65,7 @@ fn create_json() -> Result<(), std::io::Error> {
         write!(writer, "{}", serde_json::to_string(&empty_tasks)?)?;
     }
 
-    let label_dir_path = &mut current_exe()?;
-    label_dir_path.push("label.json");
+    let label_dir_path = current_exe()?.parent().unwrap().join("labels.json");
 
     if !label_dir_path.is_file() {
         let file = File::create(label_dir_path)?;
