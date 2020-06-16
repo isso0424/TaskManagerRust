@@ -10,6 +10,7 @@ use crate::command::types::{label::Labels, task::Tasks};
 extern crate log;
 
 mod command;
+mod config;
 
 fn load_args() -> Result<Vec<String>, String> {
     let not_enough_args: String = "Not enough args".to_owned();
