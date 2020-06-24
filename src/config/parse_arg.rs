@@ -1,6 +1,5 @@
 use chrono::offset::Local;
 use chrono::TimeZone;
-use std::convert::TryInto;
 
 pub fn get_limit(args: &Vec<String>) -> Option<i64> {
     if let Some(index) = args.iter().position(|arg| arg == "--limit") {

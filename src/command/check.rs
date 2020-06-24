@@ -4,7 +4,7 @@ use chrono::{Local, TimeZone};
 fn check_label() -> Result<(), String> {
     let labels = Labels::load().map_err(|err| return err.to_string())?;
 
-    let all_label_notifies = "".to_string();
+    let mut all_label_notifies = "".to_string();
 
     for label in labels.content {
         all_label_notifies = all_label_notifies + label.title.as_str() + "\n";
@@ -21,23 +21,24 @@ fn check_label() -> Result<(), String> {
 }
 
 fn check_task() -> Result<(), String> {
-    let all_task_notifies = "".to_string();
+    let mut all_task_notifies = "".to_string();
     let tasks = Tasks::load().map_err(|err| return err.to_string())?;
 
     let all_task_notifies_vec: Vec<String> = tasks
         .content
         .iter()
         .map(|task| {
-            let task_title = task.title;
+            let task_title = &task.title;
             let task_limit: String = match task.limit {
                 Some(limit) => Local.timestamp(limit, 0).to_string(),
                 None => "なし".to_string(),
             };
-            let task_labels = match task.label {
+            let empty_vector = vec![];
+            let task_labels = match &task.label {
                 Some(labels) => labels,
-                None => vec![],
+                None => &empty_vector,
             };
-            let task_label = "".to_string();
+            let mut task_label = "".to_string();
             for label in task_labels {
                 task_label = task_label + label.title.as_str() + "  ";
             }
@@ -62,7 +63,7 @@ fn check_task() -> Result<(), String> {
     Ok(())
 }
 
-fn check(args: Vec<String>) -> Result<(), String> {
+pub fn check(args: Vec<String>) -> Result<(), String> {
     let target = &args[2];
 
     match target.as_str() {
@@ -72,6 +73,7 @@ fn check(args: Vec<String>) -> Result<(), String> {
         "task" => {
             check_task()?;
         }
+        _ => return Err("Target not found.".to_string()),
     }
     Ok(())
 }
