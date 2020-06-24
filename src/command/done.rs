@@ -18,6 +18,8 @@ fn mark_done_task(task_title: String) -> Result<(), String> {
             limit: task.limit,
             done: true,
         };
+
+        tasks.save().map_err(|err| err.to_string())?;
         return Ok(());
     }
 
