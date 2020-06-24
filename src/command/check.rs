@@ -20,14 +20,28 @@ fn check_label() -> Result<(), String> {
     Ok(())
 }
 
-fn check_task() -> Result<(), String> {
-    let mut all_task_notifies = "".to_string();
-    let tasks = Tasks::load().map_err(|err| return err.to_string())?;
-
-    let all_task_notifies_vec: Vec<String> = tasks
+fn get_done_notifies(tasks: &Tasks) -> Vec<String> {
+    tasks
         .content
         .iter()
         .map(|task| {
+            if !task.done {
+                return "".to_string();
+            }
+            let task_title = &task.title;
+            format!("タスク名:{}\n\n", task_title)
+        })
+        .collect()
+}
+
+fn get_notifies(tasks: &Tasks) -> Vec<String> {
+    tasks
+        .content
+        .iter()
+        .map(|task| {
+            if task.done {
+                return "".to_string();
+            }
             let task_title = &task.title;
             let task_limit: String = match task.limit {
                 Some(limit) => Local.timestamp(limit, 0).to_string(),
@@ -43,19 +57,55 @@ fn check_task() -> Result<(), String> {
                 task_label = task_label + label.title.as_str() + "  ";
             }
             format!(
-                "タスク名:{}\n期限:{}\nラベル:{}\n\n\n\n",
+                "タスク名:{}\n期限:{}\nラベル:{}\n",
                 task_title, task_limit, task_label
             )
         })
-        .collect();
+        .collect()
+}
 
-    for task in all_task_notifies_vec {
-        all_task_notifies = all_task_notifies + task.as_str();
+fn create_task_notify(tasks: Vec<String>) -> String {
+    let mut task_notifies = "".to_string();
+
+    if tasks.len() == 0 {
+        return "現在残っているタスクはありません".to_string();
     }
 
+    for task in tasks {
+        task_notifies = task_notifies + task.as_str();
+    }
+
+    task_notifies
+}
+
+fn create_done_task_notify(tasks: Vec<String>) -> String {
+    let mut done_task_notifies = "".to_string();
+
+    if tasks.len() == 0 {
+        return "現在完了済みのタスクはありません".to_string();
+    }
+
+    for task in tasks {
+        done_task_notifies = done_task_notifies + task.as_str();
+    }
+
+    done_task_notifies
+}
+
+fn check_task() -> Result<(), String> {
+    let tasks = Tasks::load().map_err(|err| return err.to_string())?;
+
+    let task_notifies_vec = get_notifies(&tasks);
+
+    let done_task_notifies_vec = get_done_notifies(&tasks);
+
+    let task_notifies = create_task_notify(task_notifies_vec);
+
+    let done_task_notifies = create_done_task_notify(done_task_notifies_vec);
+
     let notification_message = format!(
-        "現在残っているタスクは以下のとおりです\n\n\n\n{}",
-        all_task_notifies
+        "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
+        task_notifies, done_task_notifies
     );
 
     println!("{}", notification_message);

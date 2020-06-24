@@ -40,6 +40,7 @@ fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Res
         title: title.to_string(),
         label: Labels::parse(label)?,
         limit: limit,
+        done: false,
     };
 
     tasks.content.push(new_task);
