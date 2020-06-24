@@ -12,6 +12,7 @@ pub struct Task {
     pub title: String,
     pub label: Option<Vec<Label>>,
     pub limit: Option<i64>,
+    pub done: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
