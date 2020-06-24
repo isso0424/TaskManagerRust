@@ -17,6 +17,7 @@ pub fn get_limit(args: &Vec<String>) -> Option<i64> {
         }
         return Some(date_time?.timestamp());
     }
+
     return None;
 }
 
@@ -26,7 +27,22 @@ pub fn get_label<'a>(args: &'a Vec<String>) -> Option<Vec<&'a str>> {
             return None;
         }
         let labels = args[index + 1].split(",").collect();
+
         return Some(labels);
     }
+
+    return None;
+}
+
+pub fn get_title(args: &Vec<String>) -> Option<String> {
+    if let Some(index) = args.iter().position(|arg| arg == "--title") {
+        if args.len() == index + 1 {
+            return None;
+        }
+        let title = args[index + 1].clone();
+
+        return Some(title);
+    }
+
     return None;
 }

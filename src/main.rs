@@ -89,7 +89,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
         "check" => command::check::check(args)?,
         "delete" => command::delete::delete(args)?,
         "done" => command::done::done(args)?,
-        "update" => print!("update"),
+        "update" => command::update::update(args)?,
         _ => {
             error!("Command not found");
             return Err("UNKNOWN ERROR".to_owned());
