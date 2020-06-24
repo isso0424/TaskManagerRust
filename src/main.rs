@@ -88,7 +88,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
         }
         "check" => command::check::check(args)?,
         "delete" => print!("delete"),
-        "done" => print!("done"),
+        "done" => command::done::done(args)?,
         "update" => print!("update"),
         _ => {
             error!("Command not found");

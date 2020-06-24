@@ -47,4 +47,18 @@ impl Tasks {
 
         Ok(())
     }
+
+    pub fn get_index(title: String) -> Result<usize, String> {
+        let tasks = Tasks::load().map_err(|err| err.to_string())?;
+
+        let mut index = 0;
+        for task in tasks.content {
+            if task.title == title {
+                return Ok(index);
+            }
+            index = index + 1;
+        }
+
+        Err("task not found".to_string())
+    }
 }
