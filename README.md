@@ -52,11 +52,6 @@ tmr update task <task title>
 |--labels|task new labels(overwrite)|--labels LABEL1 LABEL2|
 |--limit|task new limit(overwrite)|--limit YYYY-MM-DD|
 
-### Update Label
-```bash
-tmr update label <label title>
-```
-
 ### Delete Task
 ```bash
 tmr delete task <task title>
