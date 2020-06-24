@@ -52,9 +52,10 @@ fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Res
 
 pub fn create(args: Vec<String>) -> Result<(), String> {
     let invalid_target = "Invalid Target".to_owned();
-    print!("create");
+
     let target = &args[2];
     let title = &args[3];
+
     match target.as_str() {
         "label" => {
             create_label(title.as_str())?;

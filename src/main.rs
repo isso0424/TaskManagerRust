@@ -87,7 +87,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
             command::create::create(args)?;
         }
         "check" => command::check::check(args)?,
-        "delete" => print!("delete"),
+        "delete" => command::delete::delete(args)?,
         "done" => command::done::done(args)?,
         "update" => print!("update"),
         _ => {
