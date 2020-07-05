@@ -72,5 +72,6 @@ pub fn create(args: Vec<String>) -> Result<(), String> {
             return Err(invalid_target);
         }
     }
+
     Ok(())
 }
