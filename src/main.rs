@@ -12,13 +12,12 @@ extern crate log;
 mod command;
 mod config;
 
-fn load_args() -> Result<Vec<String>, String> {
-    let not_enough_args: String = "Not enough args".to_owned();
-    let invalid_command: String = "Invalid subcommand".to_owned();
+fn check_args() -> Result<Vec<String>, String> {
+    let not_enough_args: String = "Not enough args".to_string();
 
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        return Err(not_enough_args.to_owned());
+        return Err(not_enough_args);
     }
 
     let command = &args[1];
@@ -34,7 +33,7 @@ fn load_args() -> Result<Vec<String>, String> {
                 return Err(not_enough_args);
             }
         }
-        _ => return Err(invalid_command),
+        _ => return Err("Invalid subcommand".to_string()),
     }
 
     Ok(args)
@@ -77,8 +76,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
         "done" => command::done::done(args)?,
         "update" => command::update::update(args)?,
         _ => {
-            error!("Command not found");
-            return Err("UNKNOWN ERROR".to_owned());
+            return Err("unknown command".to_string());
         }
     }
 
@@ -86,7 +84,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
 }
 
 fn main() {
-    let args = match load_args() {
+    let args = match check_args() {
         Ok(arg) => arg,
         Err(error) => {
             error!("{}", error);
@@ -96,6 +94,9 @@ fn main() {
 
     match execute(args) {
         Ok(_) => print!("executed!!!"),
-        Err(error) => print!("{}", error),
+        Err(error) => {
+            error!("{}", error);
+            std::process::exit(1);
+        }
     }
 }
