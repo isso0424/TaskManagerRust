@@ -24,28 +24,13 @@ fn load_args() -> Result<Vec<String>, String> {
     let command = &args[1];
 
     match command.as_str() {
-        "create" => {
+        "create" | "update" | "delete" => {
             if args.len() < 4 {
                 return Err(not_enough_args);
             }
         }
-        "check" => {
+        "check" | "done" => {
             if args.len() < 3 {
-                return Err(not_enough_args);
-            }
-        }
-        "done" => {
-            if args.len() < 3 {
-                return Err(not_enough_args);
-            }
-        }
-        "update" => {
-            if args.len() < 4 {
-                return Err(not_enough_args);
-            }
-        }
-        "delete" => {
-            if args.len() < 4 {
                 return Err(not_enough_args);
             }
         }
