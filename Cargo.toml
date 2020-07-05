@@ -1,5 +1,5 @@
 [package]
-name = "TaskManagerRust"
+name = "taskmanager_rust"
 version = "0.1.0"
 authors = ["isso0424 <isso04240129@gmail.com>"]
 edition = "2018"
