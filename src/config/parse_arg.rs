@@ -38,13 +38,45 @@ pub fn get_label<'a>(args: &'a Vec<String>) -> Option<Vec<&'a str>> {
 
 pub fn get_title(args: &Vec<String>) -> Option<String> {
     if let Some(index) = args.iter().position(|arg| arg == "--title") {
-        if args.len() == index + 1 {
+        let target_index = index + 1;
+        if args.len() == target_index {
             return None;
         }
-        let title = args[index + 1].clone();
+        let title = args[target_index].clone();
 
         return Some(title);
     }
 
-    return None;
+    None
+}
+
+pub fn get_search_keyword(args: &Vec<String>) -> Option<String> {
+    if let Some(index) = args
+        .iter()
+        .position(|arg| arg == "-k" || arg == "--keyword")
+    {
+        let target_index = index + 1;
+        if args.len() == target_index {
+            return None;
+        }
+        let keyword = args[target_index].clone();
+
+        return Some(keyword);
+    }
+
+    None
+}
+
+pub fn get_search_label(args: &Vec<String>) -> Option<String> {
+    if let Some(index) = args.iter().position(|arg| arg == "-l" || arg == "--label") {
+        let target_index = index + 1;
+        if args.len() == target_index {
+            return None;
+        }
+        let label = args[target_index].clone();
+
+        return Some(label);
+    }
+
+    None
 }
