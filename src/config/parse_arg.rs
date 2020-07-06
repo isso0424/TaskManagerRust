@@ -3,11 +3,12 @@ use chrono::TimeZone;
 
 pub fn get_limit(args: &Vec<String>) -> Option<i64> {
     if let Some(index) = args.iter().position(|arg| arg == "--limit") {
-        if args.len() == index + 1 {
+        let target_index = index + 1;
+        if args.len() == target_index {
             return None;
         }
 
-        let raw_date_time = &args[index + 1];
+        let raw_date_time = &args[target_index];
         let date_time = Local
             .datetime_from_str(format!("{} 00:00", raw_date_time).as_str(), "%F %R")
             .ok();
@@ -23,10 +24,11 @@ pub fn get_limit(args: &Vec<String>) -> Option<i64> {
 
 pub fn get_label<'a>(args: &'a Vec<String>) -> Option<Vec<&'a str>> {
     if let Some(index) = args.iter().position(|arg| arg == "--label") {
-        if args.len() == index + 1 {
+        let target_index = index + 1;
+        if args.len() == target_index {
             return None;
         }
-        let labels = args[index + 1].split(",").collect();
+        let labels = args[target_index].split(",").collect();
 
         return Some(labels);
     }
