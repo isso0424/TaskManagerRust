@@ -68,4 +68,16 @@ impl Labels {
 
         Ok(())
     }
+
+    pub fn search_title(mut self, keyword: String) -> Self {
+        let searched_labels = self
+            .content
+            .drain(..)
+            .filter(|label| label.title.contains(keyword.as_str()))
+            .collect();
+
+        Labels {
+            content: searched_labels,
+        }
+    }
 }

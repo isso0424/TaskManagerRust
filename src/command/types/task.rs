@@ -51,14 +51,39 @@ impl Tasks {
     pub fn get_index(title: String) -> Result<usize, String> {
         let tasks = Tasks::load().map_err(|err| err.to_string())?;
 
-        let mut index = 0;
-        for task in tasks.content {
+        for (i, task) in tasks.content.iter().enumerate() {
             if task.title == title {
-                return Ok(index);
+                return Ok(i);
             }
-            index = index + 1;
         }
 
         Err("task not found".to_string())
+    }
+
+    pub fn search_with_title(mut self, title: String) -> Self {
+        let searched_tasks = self
+            .content
+            .drain(..)
+            .filter(|task| task.title.contains(title.as_str()))
+            .collect();
+
+        Tasks {
+            content: searched_tasks,
+        }
+    }
+
+    pub fn search_with_labels(mut self, target_label: String) -> Self {
+        let searched_tasks = self
+            .content
+            .drain(..)
+            .filter(|task| match &task.label {
+                Some(task) => task.iter().any(|label| label.title == target_label),
+                None => false,
+            })
+            .collect();
+
+        Tasks {
+            content: searched_tasks,
+        }
     }
 }
