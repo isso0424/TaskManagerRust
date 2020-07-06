@@ -69,7 +69,12 @@ impl Labels {
         Ok(())
     }
 
-    pub fn search_title(mut self, keyword: String) -> Self {
+    pub fn search_with_title(mut self, title: Option<String>) -> Self {
+        let keyword = match title {
+            Some(v) => v,
+            None => return self,
+        };
+
         let searched_labels = self
             .content
             .drain(..)

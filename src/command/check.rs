@@ -1,8 +1,13 @@
 use crate::command::types::{label::Labels, task::Tasks};
 use chrono::{Local, TimeZone};
 
-fn check_label() -> Result<(), String> {
-    let labels = Labels::load().map_err(|err| return err.to_string())?;
+use crate::config::parse_arg;
+
+fn check_label(args: Vec<String>) -> Result<(), String> {
+    let title = parse_arg::get_search_keyword(&args);
+    let labels = Labels::load()
+        .map_err(|err| return err.to_string())?
+        .search_with_title(title);
 
     let mut all_label_notifies = "".to_string();
 
@@ -92,8 +97,14 @@ fn create_done_task_notify(tasks: Vec<String>) -> String {
     done_task_notifies
 }
 
-fn check_task() -> Result<(), String> {
-    let tasks = Tasks::load().map_err(|err| return err.to_string())?;
+fn check_task(args: Vec<String>) -> Result<(), String> {
+    let title = parse_arg::get_search_keyword(&args);
+    let label = parse_arg::get_search_label(&args);
+
+    let tasks = Tasks::load()
+        .map_err(|err| return err.to_string())?
+        .search_with_title(title)
+        .search_with_label(label);
 
     let task_notifies_vec = get_notifies(&tasks);
 
@@ -118,10 +129,10 @@ pub fn check(args: Vec<String>) -> Result<(), String> {
 
     match target.as_str() {
         "label" => {
-            check_label()?;
+            check_label(args)?;
         }
         "task" => {
-            check_task()?;
+            check_task(args)?;
         }
         _ => return Err("Target not found.".to_string()),
     }

@@ -60,11 +60,16 @@ impl Tasks {
         Err("task not found".to_string())
     }
 
-    pub fn search_with_title(mut self, title: String) -> Self {
+    pub fn search_with_title(mut self, title: Option<String>) -> Self {
+        let keyword = match title {
+            Some(v) => v,
+            None => return self,
+        };
+
         let searched_tasks = self
             .content
             .drain(..)
-            .filter(|task| task.title.contains(title.as_str()))
+            .filter(|task| task.title.contains(keyword.as_str()))
             .collect();
 
         Tasks {
@@ -72,12 +77,17 @@ impl Tasks {
         }
     }
 
-    pub fn search_with_labels(mut self, target_label: String) -> Self {
+    pub fn search_with_label(mut self, target_label: Option<String>) -> Self {
+        let keyword = match target_label {
+            Some(v) => v,
+            None => return self,
+        };
+
         let searched_tasks = self
             .content
             .drain(..)
             .filter(|task| match &task.label {
-                Some(task) => task.iter().any(|label| label.title == target_label),
+                Some(task) => task.iter().any(|label| label.title == keyword),
                 None => false,
             })
             .collect();
