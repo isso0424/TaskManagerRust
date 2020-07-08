@@ -5,6 +5,8 @@ use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
 
+use chrono::{Local, TimeZone};
+
 use crate::command::types::label::Label;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -94,6 +96,37 @@ impl Tasks {
 
         Tasks {
             content: searched_tasks,
+        }
+    }
+}
+
+impl Task {
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
+
+    fn get_limit(&self) -> i64 {
+        match self.limit {
+            Some(limit) => limit,
+            None => 0,
+        }
+    }
+
+    pub fn get_label(&self) -> Vec<Label> {
+        match &self.label {
+            Some(labels) => labels.clone(),
+            None => vec![],
+        }
+    }
+
+    pub fn get_done(&self) -> bool {
+        self.done
+    }
+
+    pub fn limit_to_string(&self) -> String {
+        match self.get_limit() {
+            0 => "なし".to_string(),
+            limit => Local.timestamp(limit, 0).to_string(),
         }
     }
 }
