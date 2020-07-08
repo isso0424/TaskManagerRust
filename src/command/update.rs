@@ -1,4 +1,4 @@
-use crate::command::types::label::Label;
+use crate::command::types::label::{Label, Labels};
 use crate::command::types::task::{Task, Tasks};
 use crate::config::parse_arg;
 
@@ -18,36 +18,20 @@ fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
     let index = Tasks::get_index(title)?;
     let new_title = match parse_arg::get_title(&args) {
         Some(value) => value,
-        None => task.title.clone(),
+        None => task.get_title(),
     };
     let new_limit = match parse_arg::get_limit(&args) {
         Some(value) => Some(value),
         None => task.limit,
     };
     let new_labels = match parse_arg::get_label(&args) {
-        Some(value) => Some(value),
-        None => match &task.label {
-            Some(value) => {
-                let labels = value;
-                Some(labels.iter().map(|label| label.title.as_str()).collect())
-            }
-            None => None,
-        },
+        Some(value) => Labels::create_label_vec(value),
+        None => task.label,
     };
 
     tasks.content[index] = Task {
         title: new_title,
-        label: match new_labels {
-            Some(labels) => Some(
-                labels
-                    .iter()
-                    .map(|value| Label {
-                        title: value.to_string(),
-                    })
-                    .collect(),
-            ),
-            None => None,
-        },
+        label: new_labels,
         limit: new_limit,
         done: task.done,
     };
