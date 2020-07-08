@@ -1,6 +1,4 @@
 use crate::command::types::{label::Labels, task::Tasks};
-use chrono::{Local, TimeZone};
-
 use crate::config::parse_arg;
 
 fn check_label(args: Vec<String>) -> Result<(), String> {
@@ -9,15 +7,15 @@ fn check_label(args: Vec<String>) -> Result<(), String> {
         .map_err(|err| return err.to_string())?
         .search_with_title(title);
 
-    let mut all_label_notifies = "".to_string();
+    let mut label_notifies = "".to_string();
 
     for label in labels.content {
-        all_label_notifies = all_label_notifies + label.title.as_str() + "\n";
+        label_notifies = label_notifies + label.title.as_str() + "\n";
     }
 
     let notification_message = format!(
         "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",
-        all_label_notifies
+        label_notifies
     );
 
     print!("{}", notification_message);
@@ -33,7 +31,7 @@ fn get_done_notifies(tasks: &Tasks) -> Vec<String> {
             if !task.done {
                 return "".to_string();
             }
-            let task_title = &task.title;
+            let task_title = task.get_title();
             format!("タスク名:{}\n\n", task_title)
         })
         .collect()
@@ -47,54 +45,62 @@ fn get_notifies(tasks: &Tasks) -> Vec<String> {
             if task.done {
                 return "".to_string();
             }
-            let task_title = &task.title;
-            let task_limit: String = match task.limit {
-                Some(limit) => Local.timestamp(limit, 0).to_string(),
-                None => "なし".to_string(),
-            };
-            let empty_vector = vec![];
-            let task_labels = match &task.label {
-                Some(labels) => labels,
-                None => &empty_vector,
-            };
-            let mut task_label = "".to_string();
+            let task_title = task.get_title();
+            let task_limit: String = task.limit_to_string();
+            let task_labels = task.get_label();
+
+            let mut label_string = "".to_string();
+
             for label in task_labels {
-                task_label = task_label + label.title.as_str() + "  ";
+                label_string = label_string + label.title.as_str() + "  ";
             }
             format!(
                 "タスク名:{}\n期限:{}\nラベル:{}\n",
-                task_title, task_limit, task_label
+                task_title, task_limit, label_string
             )
         })
         .collect()
 }
 
-fn create_task_notify(tasks: Vec<String>) -> String {
-    let mut task_notifies = "".to_string();
+fn create_task_notify(tasks: &Tasks) -> String {
+    let task_notifies = get_notifies(tasks);
+    let mut notifies = "".to_string();
 
-    if tasks.len() == 0 {
+    if task_notifies.len() == 0 {
         return "現在残っているタスクはありません".to_string();
     }
 
-    for task in tasks {
-        task_notifies = task_notifies + task.as_str();
+    for task in task_notifies {
+        notifies = notifies + task.as_str();
     }
 
-    task_notifies
+    notifies
 }
 
-fn create_done_task_notify(tasks: Vec<String>) -> String {
-    let mut done_task_notifies = "".to_string();
+fn create_done_task_notify(tasks: &Tasks) -> String {
+    let task_notifies = get_done_notifies(tasks);
+    let mut notifies = "".to_string();
 
-    if tasks.len() == 0 {
+    if task_notifies.len() == 0 {
         return "現在完了済みのタスクはありません".to_string();
     }
 
-    for task in tasks {
-        done_task_notifies = done_task_notifies + task.as_str();
+    for task in task_notifies {
+        notifies = notifies + task.as_str();
     }
 
-    done_task_notifies
+    notifies
+}
+
+fn create_notification_message(tasks: Tasks) -> String {
+    let task_notifies = create_task_notify(&tasks);
+
+    let done_task_notifies = create_done_task_notify(&tasks);
+
+    format!(
+        "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
+        task_notifies, done_task_notifies
+    )
 }
 
 fn check_task(args: Vec<String>) -> Result<(), String> {
@@ -106,18 +112,7 @@ fn check_task(args: Vec<String>) -> Result<(), String> {
         .search_with_title(title)
         .search_with_label(label);
 
-    let task_notifies_vec = get_notifies(&tasks);
-
-    let done_task_notifies_vec = get_done_notifies(&tasks);
-
-    let task_notifies = create_task_notify(task_notifies_vec);
-
-    let done_task_notifies = create_done_task_notify(done_task_notifies_vec);
-
-    let notification_message = format!(
-        "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
-        task_notifies, done_task_notifies
-    );
+    let notification_message = create_notification_message(tasks);
 
     println!("{}", notification_message);
 
@@ -136,5 +131,6 @@ pub fn check(args: Vec<String>) -> Result<(), String> {
         }
         _ => return Err("Target not found.".to_string()),
     }
+
     Ok(())
 }
