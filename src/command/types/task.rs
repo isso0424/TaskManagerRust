@@ -105,7 +105,7 @@ impl Task {
         self.title.clone()
     }
 
-    fn get_limit(&self) -> i64 {
+    pub fn get_limit(&self) -> i64 {
         match self.limit {
             Some(limit) => limit,
             None => 0,
@@ -128,5 +128,10 @@ impl Task {
             0 => "なし".to_string(),
             limit => Local.timestamp(limit, 0).to_string(),
         }
+    }
+
+    pub fn labels_to_string(&self) -> String {
+        let labels = self.get_label();
+        labels.iter().map(|label| label.title.as_str()).collect()
     }
 }
