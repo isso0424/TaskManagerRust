@@ -92,11 +92,8 @@ fn main() {
         }
     };
 
-    match execute(args) {
-        Ok(_) => print!("executed!!!"),
-        Err(error) => {
-            error!("{}", error);
-            std::process::exit(1);
-        }
+    if let Err(error) = execute(args) {
+        error!("{}", error);
+        std::process::exit(1);
     }
 }
