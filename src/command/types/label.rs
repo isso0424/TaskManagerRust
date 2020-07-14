@@ -32,7 +32,7 @@ impl Labels {
         if raw_labels.is_none() {
             return Ok(None);
         }
-        let all_labels = Labels::load().map_err(|err| return err.to_string())?;
+        let all_labels = Labels::load().map_err(|err| err.to_string())?;
         for raw_label in match raw_labels {
             Some(value) => value,
             None => return Ok(None),

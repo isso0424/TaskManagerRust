@@ -4,7 +4,7 @@ use crate::config::parse_arg;
 fn check_label(args: Vec<String>) -> Result<(), String> {
     let title = parse_arg::get_search_keyword(&args);
     let labels = Labels::load()
-        .map_err(|err| return err.to_string())?
+        .map_err(|err| err.to_string())?
         .search_with_title(title);
 
     let mut label_notifies = "".to_string();
@@ -108,7 +108,7 @@ fn check_task(args: Vec<String>) -> Result<(), String> {
     let label = parse_arg::get_search_label(&args);
 
     let tasks = Tasks::load()
-        .map_err(|err| return err.to_string())?
+        .map_err(|err| err.to_string())?
         .search_with_title(title)
         .search_with_label(label);
 

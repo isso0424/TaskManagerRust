@@ -21,7 +21,7 @@ fn create_label(title: &str) -> Result<(), String> {
 
     labels.content.push(new_label);
 
-    let _ = labels.save().map_err(|err| return err.to_string())?;
+    let _ = labels.save().map_err(|err| err.to_string())?;
 
     Ok(())
 }
@@ -39,13 +39,13 @@ fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Res
     let new_task = Task {
         title: title.to_string(),
         label: Labels::parse(label)?,
-        limit: limit,
+        limit,
         done: false,
     };
 
     tasks.content.push(new_task);
 
-    let _ = tasks.save().map_err(|err| return err.to_string())?;
+    let _ = tasks.save().map_err(|err| err.to_string())?;
 
     Ok(())
 }
