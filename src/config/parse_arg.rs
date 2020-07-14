@@ -111,4 +111,27 @@ mod tests {
 
         assert_eq!(get_limit(&args), None);
     }
+
+    #[test]
+    fn get_label_success() {
+        let args: Vec<String> = vec!["--label", "label1,label2"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        let result = vec!["label1", "label2"];
+
+        assert_eq!(get_label(&args), Some(result));
+    }
+
+    #[test]
+    fn get_label_failed() {
+        let args: Vec<String> = vec!["--label"].iter().map(|arg| arg.to_string()).collect();
+
+        assert_eq!(get_label(&args), None);
+
+        let args: Vec<String> = vec![""].iter().map(|arg| arg.to_string()).collect();
+
+        assert_eq!(get_label(&args), None);
+    }
 }
