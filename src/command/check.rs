@@ -4,7 +4,7 @@ use crate::config::parse_arg;
 fn check_label(args: Vec<String>) -> Result<(), String> {
     let title = parse_arg::get_search_keyword(&args);
     let labels = Labels::load()
-        .map_err(|err| return err.to_string())?
+        .map_err(|err| err.to_string())?
         .search_with_title(title);
 
     let mut label_notifies = "".to_string();
@@ -66,12 +66,12 @@ fn create_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.len() == 0 {
+    if task_notifies.is_empty() {
         return "現在残っているタスクはありません".to_string();
     }
 
     for task in task_notifies {
-        notifies = notifies + task.as_str();
+        notifies += task.as_str();
     }
 
     notifies
@@ -81,12 +81,12 @@ fn create_done_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_done_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.len() == 0 {
+    if task_notifies.is_empty() {
         return "現在完了済みのタスクはありません".to_string();
     }
 
     for task in task_notifies {
-        notifies = notifies + task.as_str();
+        notifies += task.as_str();
     }
 
     notifies
@@ -108,7 +108,7 @@ fn check_task(args: Vec<String>) -> Result<(), String> {
     let label = parse_arg::get_search_label(&args);
 
     let tasks = Tasks::load()
-        .map_err(|err| return err.to_string())?
+        .map_err(|err| err.to_string())?
         .search_with_title(title)
         .search_with_label(label);
 

@@ -31,7 +31,7 @@ fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
 
     tasks.content[index] = Task {
         title: new_title,
-        label: new_labels.clone(),
+        label: new_labels,
         limit: new_limit,
         done: task.done,
     };
