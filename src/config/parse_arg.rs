@@ -77,3 +77,38 @@ pub fn get_search_label(args: &[String]) -> Option<String> {
 
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_limit_success() {
+        let args: Vec<String> = vec!["--limit", "1999-12-12"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        assert_eq!(get_limit(&args), Some(944924400));
+    }
+
+    #[test]
+    fn get_limit_failed() {
+        let args: Vec<String> = vec!["--limit", "unchi-12-12"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        assert_eq!(get_limit(&args), None);
+
+        let args: Vec<String> = vec!["--limit"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_limit(&args), None);
+
+        let args: Vec<String> = vec!["1999-12-12"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        assert_eq!(get_limit(&args), None);
+    }
+}
