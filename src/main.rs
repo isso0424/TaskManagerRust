@@ -54,15 +54,15 @@ fn create_file(file_name: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn create_data_json() -> Result<(), std::io::Error> {
-    create_file("tasks.json")?;
-    create_file("labels.json")?;
+fn create_data_json() -> Result<(), String> {
+    create_file("tasks.json").map_err(|err| err.to_string())?;
+    create_file("labels.json").map_err(|err| err.to_string())?;
 
     Ok(())
 }
 
 fn execute(args: Vec<String>) -> Result<(), String> {
-    create_data_json().map_err(|err| err.to_string())?;
+    create_data_json()?;
 
     let command_name = &args[1];
 
@@ -159,5 +159,11 @@ mod tests {
             check_args(args.clone()),
             Err("Invalid subcommand".to_string())
         );
+    }
+
+    #[test]
+    fn create_data_json_success() {
+        //
+        assert_eq!(create_data_json(), Ok(()));
     }
 }
