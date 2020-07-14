@@ -9,9 +9,9 @@ fn check_label(args: Vec<String>) -> Result<(), String> {
 
     let mut label_notifies = "".to_string();
 
-    for label in labels.content {
-        label_notifies = label_notifies + label.title.as_str() + "\n";
-    }
+    labels.content.iter().for_each(|label| {
+        label_notifies = label_notifies.clone() + label.title.as_str() + "\n";
+    });
 
     let notification_message = format!(
         "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",

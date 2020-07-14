@@ -24,14 +24,14 @@ fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
         Some(value) => Some(value),
         None => task.limit,
     };
-    let new_labels = match parse_arg::get_label(&args) {
+    let new_labels = match &parse_arg::get_label(&args) {
         Some(value) => Labels::create_label_vec(value),
-        None => task.label,
+        None => task.label.clone(),
     };
 
     tasks.content[index] = Task {
         title: new_title,
-        label: new_labels,
+        label: new_labels.clone(),
         limit: new_limit,
         done: task.done,
     };
