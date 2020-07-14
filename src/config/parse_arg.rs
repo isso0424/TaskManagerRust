@@ -1,4 +1,4 @@
-use chrono::offset::Local;
+use chrono::offset::Utc;
 use chrono::TimeZone;
 
 pub fn get_limit(args: &[String]) -> Option<i64> {
@@ -9,7 +9,7 @@ pub fn get_limit(args: &[String]) -> Option<i64> {
         }
 
         let raw_date_time = &args[target_index];
-        let date_time = Local
+        let date_time = Utc
             .datetime_from_str(format!("{} 00:00", raw_date_time).as_str(), "%F %R")
             .ok();
 
@@ -88,7 +88,7 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-        assert_eq!(get_limit(&args), Some(944924400));
+        assert_eq!(get_limit(&args), Some(944956800));
     }
 
     #[test]
