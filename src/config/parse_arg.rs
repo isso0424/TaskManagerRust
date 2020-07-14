@@ -173,4 +173,34 @@ mod tests {
         let args: Vec<String> = vec!["label"].iter().map(|arg| arg.to_string()).collect();
         assert_eq!(get_search_label(&args), None);
     }
+
+    #[test]
+    fn get_search_keyword_success() {
+        let args: Vec<String> = vec!["--keyword", "title"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+        assert_eq!(get_search_keyword(&args), Some("title".to_string()));
+
+        let args: Vec<String> = vec!["-k", "title"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+        assert_eq!(get_search_keyword(&args), Some("title".to_string()));
+    }
+
+    #[test]
+    fn get_search_keyword_failed() {
+        let args: Vec<String> = vec!["--keyword"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+        assert_eq!(get_search_keyword(&args), None);
+
+        let args: Vec<String> = vec!["-k"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_search_keyword(&args), None);
+
+        let args: Vec<String> = vec!["keyword"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_search_keyword(&args), None);
+    }
 }
