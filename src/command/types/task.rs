@@ -119,10 +119,6 @@ impl Task {
         }
     }
 
-    pub fn get_done(&self) -> bool {
-        self.done
-    }
-
     pub fn limit_to_string(&self) -> String {
         match self.get_limit() {
             0 => "なし".to_string(),
