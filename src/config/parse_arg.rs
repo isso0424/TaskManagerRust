@@ -134,4 +134,23 @@ mod tests {
 
         assert_eq!(get_label(&args), None);
     }
+
+    #[test]
+    fn get_title_success() {
+        let args: Vec<String> = vec!["--title", "title"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        assert_eq!(get_title(&args), Some("title".to_string()));
+    }
+
+    #[test]
+    fn get_title_failed() {
+        let args: Vec<String> = vec!["title"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_title(&args), None);
+
+        let args: Vec<String> = vec!["--title"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_title(&args), None);
+    }
 }
