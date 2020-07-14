@@ -88,7 +88,6 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-
         assert_eq!(get_limit(&args), Some(944924400));
     }
 
@@ -98,7 +97,6 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-
         assert_eq!(get_limit(&args), None);
 
         let args: Vec<String> = vec!["--limit"].iter().map(|arg| arg.to_string()).collect();
@@ -108,7 +106,6 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-
         assert_eq!(get_limit(&args), None);
     }
 
@@ -118,20 +115,16 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-
         let result = vec!["label1", "label2"];
-
         assert_eq!(get_label(&args), Some(result));
     }
 
     #[test]
     fn get_label_failed() {
         let args: Vec<String> = vec!["--label"].iter().map(|arg| arg.to_string()).collect();
-
         assert_eq!(get_label(&args), None);
 
         let args: Vec<String> = vec![""].iter().map(|arg| arg.to_string()).collect();
-
         assert_eq!(get_label(&args), None);
     }
 
@@ -141,7 +134,6 @@ mod tests {
             .iter()
             .map(|arg| arg.to_string())
             .collect();
-
         assert_eq!(get_title(&args), Some("title".to_string()));
     }
 
@@ -152,5 +144,33 @@ mod tests {
 
         let args: Vec<String> = vec!["--title"].iter().map(|arg| arg.to_string()).collect();
         assert_eq!(get_title(&args), None);
+    }
+
+    #[test]
+    fn get_search_label_success() {
+        let args: Vec<String> = vec!["--label", "label1"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+        assert_eq!(get_search_label(&args), Some("label1".to_string()));
+
+        let args: Vec<String> = vec!["-l", "label1"]
+            .iter()
+            .map(|arg| arg.to_string())
+            .collect();
+
+        assert_eq!(get_search_label(&args), Some("label1".to_string()));
+    }
+
+    #[test]
+    fn get_search_label_failed() {
+        let args: Vec<String> = vec!["--label"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_search_label(&args), None);
+
+        let args: Vec<String> = vec!["-l"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_search_label(&args), None);
+
+        let args: Vec<String> = vec!["label"].iter().map(|arg| arg.to_string()).collect();
+        assert_eq!(get_search_label(&args), None);
     }
 }
