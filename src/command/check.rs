@@ -66,12 +66,12 @@ fn create_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.len() == 0 {
+    if task_notifies.is_empty() {
         return "現在残っているタスクはありません".to_string();
     }
 
     for task in task_notifies {
-        notifies = notifies + task.as_str();
+        notifies += task.as_str();
     }
 
     notifies
@@ -81,12 +81,12 @@ fn create_done_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_done_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.len() == 0 {
+    if task_notifies.is_empty() {
         return "現在完了済みのタスクはありません".to_string();
     }
 
     for task in task_notifies {
-        notifies = notifies + task.as_str();
+        notifies += task.as_str();
     }
 
     notifies
