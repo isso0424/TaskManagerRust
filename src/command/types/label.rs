@@ -5,12 +5,12 @@ use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Label {
     pub title: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Labels {
     pub content: Vec<Label>,
 }
