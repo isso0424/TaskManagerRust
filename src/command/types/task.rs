@@ -9,7 +9,7 @@ use chrono::{Local, TimeZone};
 
 use crate::command::types::label::Label;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Task {
     pub title: String,
     pub label: Option<Vec<Label>>,
@@ -17,7 +17,7 @@ pub struct Task {
     pub done: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Tasks {
     pub content: Vec<Task>,
 }
