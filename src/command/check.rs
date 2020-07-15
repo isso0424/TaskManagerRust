@@ -2,6 +2,10 @@ use crate::command::types::{label::Labels, task::Tasks};
 use crate::config::parse_arg;
 
 fn create_labels(labels: Labels, keyword: Option<String>) -> String {
+    if labels.content.is_empty() {
+        return "現在ラベルは存在しません".to_string();
+    }
+
     let searched_labels = labels.search_with_title(keyword);
 
     let mut label_notifies = "".to_string();
@@ -9,6 +13,10 @@ fn create_labels(labels: Labels, keyword: Option<String>) -> String {
     searched_labels.content.iter().for_each(|label| {
         label_notifies = label_notifies.clone() + label.title.as_str() + "\n";
     });
+
+    if label_notifies == "" {
+        return "検索条件に合うラベルは存在しません".to_string();
+    }
 
     format!(
         "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",
