@@ -5,12 +5,7 @@ use crate::command::types::{
 
 use crate::config::parse_arg::{get_label, get_limit};
 
-fn create_label(title: &str) -> Result<(), String> {
-    let mut labels = match Labels::load() {
-        Ok(labels) => labels,
-        Err(err) => return Err(err.to_string()),
-    };
-
+fn update_label(mut labels: Labels, title: &str) -> Result<Labels, String> {
     if labels.content.iter().any(|x| x.title == title) {
         return Err("Cannot use duplicate label title".to_string());
     }
@@ -21,17 +16,25 @@ fn create_label(title: &str) -> Result<(), String> {
 
     labels.content.push(new_label);
 
-    let _ = labels.save().map_err(|err| err.to_string())?;
+    Ok(labels)
+}
+
+fn create_label(title: &str) -> Result<(), String> {
+    let labels = match Labels::load() {
+        Ok(labels) => update_label(labels, title)?,
+        Err(err) => return Err(err.to_string()),
+    };
+    labels.save().map_err(|err| err.to_string())?;
 
     Ok(())
 }
 
-fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Result<(), String> {
-    let mut tasks = match Tasks::load() {
-        Ok(tasks) => tasks,
-        Err(err) => return Err(err.to_string()),
-    };
-
+fn update_task(
+    mut tasks: Tasks,
+    title: &str,
+    label: Option<Vec<&str>>,
+    limit: Option<i64>,
+) -> Result<Tasks, String> {
     if tasks.content.iter().any(|x| x.title == title) {
         return Err("Cannot use duplicate task title".to_string());
     }
@@ -45,7 +48,15 @@ fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Res
 
     tasks.content.push(new_task);
 
-    let _ = tasks.save().map_err(|err| err.to_string())?;
+    Ok(tasks)
+}
+
+fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Result<(), String> {
+    let tasks = match Tasks::load() {
+        Ok(tasks) => update_task(tasks, title, label, limit)?,
+        Err(err) => return Err(err.to_string()),
+    };
+    tasks.save().map_err(|err| err.to_string())?;
 
     Ok(())
 }
