@@ -66,11 +66,14 @@ fn create_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.is_empty() {
+    if task_notifies.iter().all(|notify| notify == "") {
         return "現在残っているタスクはありません".to_string();
     }
 
     for task in task_notifies {
+        if task == "" {
+            continue;
+        }
         notifies += task.as_str();
     }
 
@@ -81,7 +84,7 @@ fn create_done_task_notify(tasks: &Tasks) -> String {
     let task_notifies = get_done_notifies(tasks);
     let mut notifies = "".to_string();
 
-    if task_notifies.is_empty() {
+    if task_notifies.iter().all(|notify| notify == "") {
         return "現在完了済みのタスクはありません".to_string();
     }
 
@@ -133,4 +136,91 @@ pub fn check(args: Vec<String>) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::command::types::{label::Label, task::Task};
+
+    #[test]
+    fn create_notification_message_success() {
+        let task = Task {
+            title: "title".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: false,
+        };
+
+        let task_done = Task {
+            title: "title".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: false,
+        };
+
+        let tasks = Tasks {
+            content: vec![task, task_done],
+        };
+
+        assert_eq!(
+            create_notification_message(tasks.clone()),
+            format!(
+                "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
+                create_task_notify(&tasks),
+                create_done_task_notify(&tasks)
+            )
+        );
+    }
+
+    #[test]
+    fn create_notification_message_empty() {
+        let task = Task {
+            title: "title".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: false,
+        };
+
+        let task_done = Task {
+            title: "title".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: true,
+        };
+
+        let tasks = Tasks {
+            content: vec![task_done],
+        };
+
+        assert_eq!(
+            create_notification_message(tasks.clone()),
+            format!(
+                "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
+                "現在残っているタスクはありません".to_string(),
+                create_done_task_notify(&tasks)
+            )
+        );
+
+        let tasks = Tasks {
+            content: vec![task],
+        };
+
+        assert_eq!(
+            create_notification_message(tasks.clone()),
+            format!(
+                "現在残っているタスクは以下のとおりです\n\n{}\n\n完了済みのタスクは以下の通りです\n\n{}",
+                create_task_notify(&tasks),
+                "現在完了済みのタスクはありません".to_string()
+            )
+        );
+    }
 }
