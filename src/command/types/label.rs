@@ -26,13 +26,14 @@ impl Labels {
         Ok(label_json)
     }
 
-    pub fn parse(raw_labels: Option<Vec<&str>>) -> Result<Option<Vec<Label>>, String> {
-        //
+    pub fn parse(
+        raw_labels: Option<Vec<&str>>,
+        all_labels: Labels,
+    ) -> Result<Option<Vec<Label>>, String> {
         let labels = &mut vec![];
         if raw_labels.is_none() {
             return Ok(None);
         }
-        let all_labels = Labels::load().map_err(|err| err.to_string())?;
         for raw_label in match raw_labels {
             Some(value) => value,
             None => return Ok(None),

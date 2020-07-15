@@ -34,14 +34,19 @@ fn update_task(
     title: &str,
     label: Option<Vec<&str>>,
     limit: Option<i64>,
+    all_labels: Labels,
 ) -> Result<Tasks, String> {
     if tasks.content.iter().any(|x| x.title == title) {
         return Err("Cannot use duplicate task title".to_string());
     }
 
+    if title == "" {
+        return Err("Cannot use empty task title".to_string());
+    }
+
     let new_task = Task {
         title: title.to_string(),
-        label: Labels::parse(label)?,
+        label: Labels::parse(label, all_labels)?,
         limit,
         done: false,
     };
@@ -52,8 +57,9 @@ fn update_task(
 }
 
 fn create_task(title: &str, label: Option<Vec<&str>>, limit: Option<i64>) -> Result<(), String> {
+    let all_labels = Labels::load().map_err(|err| err.to_string())?;
     let tasks = match Tasks::load() {
-        Ok(tasks) => update_task(tasks, title, label, limit)?,
+        Ok(tasks) => update_task(tasks, title, label, limit, all_labels)?,
         Err(err) => return Err(err.to_string()),
     };
     tasks.save().map_err(|err| err.to_string())?;
@@ -114,5 +120,75 @@ mod tests {
             }],
         };
         assert_eq!(update_label(labels, title).ok(), None);
+    }
+
+    #[test]
+    fn update_task_success() {
+        let title = "title";
+        let limit = Some(114514);
+        let label = Some(vec!["label"]);
+        let tasks = Tasks { content: vec![] };
+        let all_labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            update_task(tasks.clone(), title, label, limit, all_labels.clone()).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: title.to_string(),
+                    label: Some(vec![Label {
+                        title: "label".to_string()
+                    }]),
+                    limit,
+                    done: false
+                }]
+            }
+        );
+
+        assert_eq!(
+            update_task(tasks, title, None, None, all_labels).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: title.to_string(),
+                    label: None,
+                    limit: None,
+                    done: false
+                }]
+            }
+        );
+    }
+
+    #[test]
+    fn update_task_failed() {
+        let title = "title";
+        let limit = Some(114514);
+        let label = Some(vec!["label"]);
+        let tasks = Tasks { content: vec![] };
+        let all_labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+        let tasks = update_task(tasks, title, label.clone(), limit, all_labels.clone()).unwrap();
+
+        assert_eq!(
+            update_task(
+                tasks.clone(),
+                title,
+                label.clone(),
+                limit,
+                all_labels.clone()
+            )
+            .ok(),
+            None
+        );
+
+        assert_eq!(
+            update_task(tasks.clone(), "", label, limit, all_labels).ok(),
+            None
+        )
     }
 }
