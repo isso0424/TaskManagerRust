@@ -1,24 +1,27 @@
 use crate::command::types::{label::Labels, task::Tasks};
 use crate::config::parse_arg;
 
-fn check_label(args: Vec<String>) -> Result<(), String> {
-    let title = parse_arg::get_search_keyword(&args);
-    let labels = Labels::load()
-        .map_err(|err| err.to_string())?
-        .search_with_title(title);
+fn create_labels(labels: Labels, keyword: Option<String>) -> String {
+    let searched_labels = labels.search_with_title(keyword);
 
     let mut label_notifies = "".to_string();
 
-    labels.content.iter().for_each(|label| {
+    searched_labels.content.iter().for_each(|label| {
         label_notifies = label_notifies.clone() + label.title.as_str() + "\n";
     });
 
-    let notification_message = format!(
+    format!(
         "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",
         label_notifies
-    );
+    )
+}
 
-    print!("{}", notification_message);
+fn check_label(args: Vec<String>) -> Result<(), String> {
+    let title = parse_arg::get_search_keyword(&args);
+    let labels = Labels::load().map_err(|err| err.to_string())?;
+
+    let label_list = create_labels(labels, title);
+    print!("{}", label_list);
 
     Ok(())
 }
@@ -223,4 +226,7 @@ mod tests {
             )
         );
     }
+
+    #[test]
+    fn 
 }
