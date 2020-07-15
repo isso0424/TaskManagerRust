@@ -86,3 +86,33 @@ pub fn create(args: Vec<String>) -> Result<(), String> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn update_label_success() {
+        let labels = Labels { content: vec![] };
+        let title = "title";
+        assert_eq!(
+            update_label(labels, title).unwrap(),
+            Labels {
+                content: vec![Label {
+                    title: title.to_string()
+                }]
+            }
+        );
+    }
+
+    #[test]
+    fn update_label_failed() {
+        let title = "title";
+        let labels = Labels {
+            content: vec![Label {
+                title: title.to_string(),
+            }],
+        };
+        assert_eq!(update_label(labels, title).ok(), None);
+    }
+}
