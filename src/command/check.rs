@@ -236,5 +236,50 @@ mod tests {
     }
 
     #[test]
-    fn 
+    fn create_labels_success() {
+        let label = Label {
+            title: "title".to_string(),
+        };
+
+        let label2 = Label {
+            title: "label".to_string(),
+        };
+
+        let labels = Labels {
+            content: vec![label, label2],
+        };
+
+        assert_eq!(
+            create_labels(labels.clone(), None),
+            format!(
+                "現在のラベルの一覧は以下のとおりです\n\n\n\n{}",
+                "title\nlabel\n"
+            )
+        );
+
+        assert_eq!(
+            create_labels(labels.clone(), Some("invalid".to_string())),
+            "検索条件に合うラベルは存在しません".to_string()
+        );
+
+        assert_eq!(
+            create_labels(labels.clone(), Some("tit".to_string())),
+            format!("現在のラベルの一覧は以下のとおりです\n\n\n\n{}", "title\n")
+        );
+    }
+
+    #[test]
+    fn create_labels_empty() {
+        let labels = Labels { content: vec![] };
+
+        assert_eq!(
+            create_labels(labels.clone(), Some("invalid".to_string())),
+            "現在ラベルは存在しません".to_string()
+        );
+
+        assert_eq!(
+            create_labels(labels.clone(), None),
+            "現在ラベルは存在しません".to_string()
+        );
+    }
 }
