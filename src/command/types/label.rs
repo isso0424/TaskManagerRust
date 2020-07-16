@@ -104,3 +104,36 @@ impl Labels {
         Some(labels)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            Labels::parse(Some(vec!["label"]), labels).unwrap(),
+            vec![Label {
+                title: "label".to_string()
+            }]
+        );
+    }
+
+    #[test]
+    fn parse_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(Labels::parse(Some(vec!["invalid"]), labels.clone()), None);
+        assert_eq!(Labels::parse(None, labels), None);
+    }
+}
