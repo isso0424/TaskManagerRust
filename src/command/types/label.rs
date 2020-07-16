@@ -136,4 +136,22 @@ mod tests {
         assert_eq!(Labels::parse(Some(vec!["invalid"]), labels.clone()), None);
         assert_eq!(Labels::parse(None, labels), None);
     }
+
+    #[test]
+    fn search_with_title_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            labels.clone().search_with_title(Some("label".to_string())),
+            labels
+        );
+        assert_eq!(
+            labels.search_with_title(Some("s".to_string())),
+            Labels { content: vec![] }
+        );
+    }
 }
