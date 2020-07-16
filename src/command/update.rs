@@ -15,7 +15,7 @@ fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
         .find(|task| task.title == title)
         .unwrap();
 
-    let index = Tasks::get_index(title)?;
+    let index = Tasks::get_index(title, &tasks)?;
     let new_title = match parse_arg::get_title(&args) {
         Some(value) => value,
         None => task.get_title(),

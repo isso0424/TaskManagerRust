@@ -10,7 +10,11 @@ fn update_task(mut tasks: Tasks, title: String) -> Result<Tasks, String> {
         .iter()
         .find(|task| task.title == title)
         .unwrap();
-    let index = Tasks::get_index(title)?;
+    let index = Tasks::get_index(title, &tasks)?;
+
+    if tasks.content[index].done {
+        return Err("Selected task already done".to_string());
+    }
 
     tasks.content[index] = Task {
         title: task.title.clone(),
