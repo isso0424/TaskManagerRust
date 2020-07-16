@@ -154,4 +154,44 @@ mod tests {
             Labels { content: vec![] }
         );
     }
+
+    #[test]
+    fn create_label_vec_success() {
+        let labels = Labels {
+            content: vec![
+                Label {
+                    title: "label1".to_string(),
+                },
+                Label {
+                    title: "label2".to_string(),
+                },
+                Label {
+                    title: "label3".to_string(),
+                },
+            ],
+        };
+
+        assert_eq!(
+            Labels::create_label_vec(&vec!["label1", "label3"], labels).unwrap(),
+            vec![
+                Label {
+                    title: "label1".to_string()
+                },
+                Label {
+                    title: "label3".to_string()
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn create_label_vec_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(Labels::create_label_vec(&vec!["invalid"], labels), None);
+    }
 }
