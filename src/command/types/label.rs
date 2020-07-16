@@ -26,17 +26,14 @@ impl Labels {
         Ok(label_json)
     }
 
-    pub fn parse(
-        raw_labels: Option<Vec<&str>>,
-        all_labels: Labels,
-    ) -> Result<Option<Vec<Label>>, String> {
+    pub fn parse(raw_labels: Option<Vec<&str>>, all_labels: Labels) -> Option<Vec<Label>> {
         let labels = &mut vec![];
         if raw_labels.is_none() {
-            return Ok(None);
+            return None;
         }
         for raw_label in match raw_labels {
             Some(value) => value,
-            None => return Ok(None),
+            None => return None,
         } {
             if !all_labels
                 .content
@@ -50,7 +47,11 @@ impl Labels {
             });
         }
 
-        Ok(Some(labels.clone()))
+        if labels.is_empty() {
+            return None;
+        }
+
+        Some(labels.clone())
     }
 
     pub fn save(&self) -> Result<(), std::io::Error> {
