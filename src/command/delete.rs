@@ -126,4 +126,32 @@ mod tests {
 
         assert_eq!(update_task(tasks, "".to_string()).ok(), None);
     }
+
+    #[test]
+    fn update_label_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "title".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            update_label(labels, "title".to_string()).unwrap(),
+            Labels { content: vec![] }
+        );
+    }
+
+    #[test]
+    fn update_label_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "title".to_string(),
+            }],
+        };
+
+        assert_eq!(update_label(labels, "".to_string()).ok(), None);
+
+        let labels = Labels { content: vec![] };
+        assert_eq!(update_label(labels, "".to_string()).ok(), None);
+    }
 }
