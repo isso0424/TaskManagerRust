@@ -43,3 +43,46 @@ pub fn done(args: Vec<String>) -> Result<(), String> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn update_task_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(
+            update_task(tasks.clone(), "target".to_string()).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: "target".to_string(),
+                    label: None,
+                    limit: None,
+                    done: true
+                }]
+            }
+        );
+    }
+
+    #[test]
+    fn update_task_failed() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: true,
+            }],
+        };
+
+        assert_eq!(update_task(tasks.clone(), "".to_string()).ok(), None);
+        assert_eq!(update_task(tasks.clone(), "target".to_string()).ok(), None);
+    }
+}
