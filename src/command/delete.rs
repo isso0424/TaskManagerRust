@@ -64,3 +64,66 @@ pub fn delete(args: Vec<String>) -> Result<(), String> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::command::types::{label::Label, task::Task};
+    #[test]
+    fn update_task_success() {
+        let tasks = Tasks {
+            content: vec![
+                Task {
+                    title: "title".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+                Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+            ],
+        };
+
+        assert_eq!(
+            update_task(tasks.clone(), "title".to_string()).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                }]
+            }
+        );
+    }
+
+    #[test]
+    fn update_task_failed() {
+        let tasks = Tasks {
+            content: vec![
+                Task {
+                    title: "title".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+                Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+            ],
+        };
+
+        assert_eq!(update_task(tasks, "".to_string()).ok(), None);
+
+        let tasks = Tasks { content: vec![] };
+
+        assert_eq!(update_task(tasks, "".to_string()).ok(), None);
+    }
+}
