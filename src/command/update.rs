@@ -2,7 +2,12 @@ use crate::command::types::label::Labels;
 use crate::command::types::task::{Task, Tasks};
 use crate::config::parse_arg;
 
-fn regeneration_task(title: String, args: Vec<String>, mut tasks: Tasks) -> Result<Tasks, String> {
+fn regeneration_task(
+    title: String,
+    args: Vec<String>,
+    mut tasks: Tasks,
+    labels: Labels,
+) -> Result<Tasks, String> {
     if !tasks.content.iter().any(|task| task.title == title) {
         return Err("Task not found".to_string());
     }
@@ -23,7 +28,7 @@ fn regeneration_task(title: String, args: Vec<String>, mut tasks: Tasks) -> Resu
         None => task.limit,
     };
     let new_labels = match &parse_arg::get_label(&args) {
-        Some(value) => Labels::create_label_vec(value),
+        Some(value) => Labels::create_label_vec(value, labels),
         None => task.label.clone(),
     };
 
@@ -38,8 +43,12 @@ fn regeneration_task(title: String, args: Vec<String>, mut tasks: Tasks) -> Resu
 }
 
 fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
+    let all_labels = match Labels::load() {
+        Ok(labels) => labels,
+        Err(_) => Labels { content: vec![] },
+    };
     let tasks = match Tasks::load() {
-        Ok(tasks) => regeneration_task(title, args, tasks)?,
+        Ok(tasks) => regeneration_task(title, args, tasks, all_labels)?,
         Err(err) => return Err(err.to_string()),
     };
 

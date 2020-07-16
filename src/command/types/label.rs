@@ -87,16 +87,11 @@ impl Labels {
         }
     }
 
-    pub fn create_label_vec(title_vec: &[&str]) -> Option<Vec<Label>> {
-        let all_labels = match Self::load() {
-            Ok(labels) => labels.content,
-            Err(_) => return None,
-        };
-
+    pub fn create_label_vec(title_vec: &[&str], all_labels: Self) -> Option<Vec<Label>> {
         let mut labels = vec![];
 
         for title in title_vec {
-            if !all_labels.iter().any(|label| label.title == *title) {
+            if !all_labels.content.iter().any(|label| label.title == *title) {
                 return None;
             }
 
