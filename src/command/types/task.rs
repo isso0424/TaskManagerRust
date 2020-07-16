@@ -50,9 +50,7 @@ impl Tasks {
         Ok(())
     }
 
-    pub fn get_index(title: String) -> Result<usize, String> {
-        let tasks = Tasks::load().map_err(|err| err.to_string())?;
-
+    pub fn get_index(title: String, tasks: &Tasks) -> Result<usize, String> {
         for (i, task) in tasks.content.iter().enumerate() {
             if task.title == title {
                 return Ok(i);
