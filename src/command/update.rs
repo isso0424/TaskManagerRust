@@ -63,3 +63,86 @@ pub fn update(args: Vec<String>) -> Result<(), String> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::command::types::label::Label;
+
+    #[test]
+    fn regeneration_task_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+        let title = "target".to_string();
+        let args = vec![
+            "--limit",
+            "1999-12-12",
+            "--label",
+            "label",
+            "--title",
+            "title",
+        ]
+        .iter()
+        .map(|arg| arg.to_string())
+        .collect();
+
+        assert_eq!(
+            regeneration_task(title, args, tasks, labels).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: "title".to_string(),
+                    label: Some(vec![Label {
+                        title: "label".to_string()
+                    }]),
+                    limit: Some(944956800),
+                    done: false,
+                }],
+            }
+        );
+    }
+
+    #[test]
+    fn regeneration_task_failed() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+        let args = vec![
+            "--limit",
+            "1999-12-12",
+            "--label",
+            "label",
+            "--title",
+            "title",
+        ]
+        .iter()
+        .map(|arg| arg.to_string())
+        .collect();
+
+        assert_eq!(
+            regeneration_task("".to_string(), args, tasks, labels).ok(),
+            None
+        );
+    }
+}
