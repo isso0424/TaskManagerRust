@@ -26,17 +26,12 @@ impl Labels {
         Ok(label_json)
     }
 
-    pub fn parse(
-        raw_labels: Option<Vec<&str>>,
-        all_labels: Labels,
-    ) -> Result<Option<Vec<Label>>, String> {
+    pub fn parse(raw_labels: Option<Vec<&str>>, all_labels: Labels) -> Option<Vec<Label>> {
         let labels = &mut vec![];
-        if raw_labels.is_none() {
-            return Ok(None);
-        }
+        raw_labels.as_ref()?;
         for raw_label in match raw_labels {
             Some(value) => value,
-            None => return Ok(None),
+            None => return None,
         } {
             if !all_labels
                 .content
@@ -50,7 +45,11 @@ impl Labels {
             });
         }
 
-        Ok(Some(labels.clone()))
+        if labels.is_empty() {
+            return None;
+        }
+
+        Some(labels.clone())
     }
 
     pub fn save(&self) -> Result<(), std::io::Error> {
@@ -101,5 +100,96 @@ impl Labels {
         }
 
         Some(labels)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            Labels::parse(Some(vec!["label"]), labels).unwrap(),
+            vec![Label {
+                title: "label".to_string()
+            }]
+        );
+    }
+
+    #[test]
+    fn parse_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(Labels::parse(Some(vec!["invalid"]), labels.clone()), None);
+        assert_eq!(Labels::parse(None, labels), None);
+    }
+
+    #[test]
+    fn search_with_title_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            labels.clone().search_with_title(Some("label".to_string())),
+            labels
+        );
+        assert_eq!(
+            labels.search_with_title(Some("s".to_string())),
+            Labels { content: vec![] }
+        );
+    }
+
+    #[test]
+    fn create_label_vec_success() {
+        let labels = Labels {
+            content: vec![
+                Label {
+                    title: "label1".to_string(),
+                },
+                Label {
+                    title: "label2".to_string(),
+                },
+                Label {
+                    title: "label3".to_string(),
+                },
+            ],
+        };
+
+        assert_eq!(
+            Labels::create_label_vec(&vec!["label1", "label3"], labels).unwrap(),
+            vec![
+                Label {
+                    title: "label1".to_string()
+                },
+                Label {
+                    title: "label3".to_string()
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn create_label_vec_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "label".to_string(),
+            }],
+        };
+
+        assert_eq!(Labels::create_label_vec(&vec!["invalid"], labels), None);
     }
 }
