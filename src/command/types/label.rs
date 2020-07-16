@@ -28,9 +28,7 @@ impl Labels {
 
     pub fn parse(raw_labels: Option<Vec<&str>>, all_labels: Labels) -> Option<Vec<Label>> {
         let labels = &mut vec![];
-        if raw_labels.is_none() {
-            return None;
-        }
+        raw_labels.as_ref()?;
         for raw_label in match raw_labels {
             Some(value) => value,
             None => return None,
