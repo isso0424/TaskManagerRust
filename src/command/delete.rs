@@ -1,37 +1,50 @@
 use crate::command::types::{label::Labels, task::Tasks};
 
-fn delete_task(title: String) -> Result<(), String> {
-    let mut tasks = Tasks::load().map_err(|err| err.to_string())?;
-
+fn update_task(mut tasks: Tasks, title: String) -> Result<Tasks, String> {
     if !tasks.content.iter().any(|task| task.title == title) {
         return Err("Task not found".to_string());
     }
 
-    let new_tasks = tasks
-        .content
-        .drain(..)
-        .filter(|task| task.title != title)
-        .collect();
+    Ok(Tasks {
+        content: tasks
+            .content
+            .drain(..)
+            .filter(|task| task.title != title)
+            .collect(),
+    })
+}
 
-    tasks.content = new_tasks;
+fn delete_task(title: String) -> Result<(), String> {
+    let tasks = match Tasks::load() {
+        Ok(tasks) => update_task(tasks, title)?,
+        Err(err) => return Err(err.to_string()),
+    };
+
     tasks.save().map_err(|err| err.to_string())?;
 
     Ok(())
 }
 
-fn delete_label(title: String) -> Result<(), String> {
-    let mut labels = Labels::load().map_err(|err| err.to_string())?;
-
+fn update_label(mut labels: Labels, title: String) -> Result<Labels, String> {
     if !labels.content.iter().any(|label| label.title == title) {
         return Err("Label not found".to_string());
     }
 
-    let new_labels = labels
-        .content
-        .drain(..)
-        .filter(|label| label.title != title)
-        .collect();
-    labels.content = new_labels;
+    Ok(Labels {
+        content: labels
+            .content
+            .drain(..)
+            .filter(|label| label.title != title)
+            .collect(),
+    })
+}
+
+fn delete_label(title: String) -> Result<(), String> {
+    let labels = match Labels::load() {
+        Ok(labels) => update_label(labels, title)?,
+        Err(err) => return Err(err.to_string()),
+    };
+
     labels.save().map_err(|err| err.to_string())?;
 
     Ok(())
@@ -50,4 +63,95 @@ pub fn delete(args: Vec<String>) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::command::types::{label::Label, task::Task};
+    #[test]
+    fn update_task_success() {
+        let tasks = Tasks {
+            content: vec![
+                Task {
+                    title: "title".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+                Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+            ],
+        };
+
+        assert_eq!(
+            update_task(tasks.clone(), "title".to_string()).unwrap(),
+            Tasks {
+                content: vec![Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                }]
+            }
+        );
+    }
+
+    #[test]
+    fn update_task_failed() {
+        let tasks = Tasks {
+            content: vec![
+                Task {
+                    title: "title".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+                Task {
+                    title: "invalid".to_string(),
+                    label: None,
+                    limit: None,
+                    done: false,
+                },
+            ],
+        };
+
+        assert_eq!(update_task(tasks, "".to_string()).ok(), None);
+
+        let tasks = Tasks { content: vec![] };
+
+        assert_eq!(update_task(tasks, "".to_string()).ok(), None);
+    }
+
+    #[test]
+    fn update_label_success() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "title".to_string(),
+            }],
+        };
+
+        assert_eq!(
+            update_label(labels, "title".to_string()).unwrap(),
+            Labels { content: vec![] }
+        );
+    }
+
+    #[test]
+    fn update_label_failed() {
+        let labels = Labels {
+            content: vec![Label {
+                title: "title".to_string(),
+            }],
+        };
+
+        assert_eq!(update_label(labels, "".to_string()).ok(), None);
+
+        let labels = Labels { content: vec![] };
+        assert_eq!(update_label(labels, "".to_string()).ok(), None);
+    }
 }
