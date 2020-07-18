@@ -148,4 +148,28 @@ mod tests {
 
         assert_eq!(Tasks::get_index("invalid".to_string(), &tasks).ok(), None);
     }
+
+    #[test]
+    fn search_with_title_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(
+            tasks.clone().search_with_title(Some("target".to_string())),
+            tasks.clone()
+        );
+
+        assert_eq!(tasks.clone().search_with_title(None), tasks.clone());
+
+        assert_eq!(
+            tasks.clone().search_with_title(Some("invalid".to_string())),
+            Tasks { content: vec![] }
+        );
+    }
 }
