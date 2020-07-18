@@ -5,7 +5,7 @@ use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
 
-use chrono::{Local, TimeZone};
+use chrono::{TimeZone, Utc};
 
 use crate::command::types::label::Label;
 
@@ -120,7 +120,7 @@ impl Task {
     pub fn limit_to_string(&self) -> String {
         match self.get_limit() {
             0 => "なし".to_string(),
-            limit => Local.timestamp(limit, 0).to_string(),
+            limit => Utc.timestamp(limit, 0).to_string(),
         }
     }
 }
@@ -245,5 +245,26 @@ mod tests {
 
         task.label = None;
         assert_eq!(task.get_label(), vec![]);
+    }
+
+    #[test]
+    fn limit_to_string_success() {
+        //
+        let mut task = Task {
+            title: "target".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: false,
+        };
+
+        assert_eq!(
+            task.limit_to_string(),
+            "1999-12-12 00:00:00 UTC".to_string()
+        );
+
+        task.limit = None;
+        assert_eq!(task.limit_to_string(), "なし".to_string());
     }
 }
