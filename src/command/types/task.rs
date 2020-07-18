@@ -224,4 +224,26 @@ mod tests {
         task.limit = None;
         assert_eq!(task.get_limit(), 0);
     }
+
+    #[test]
+    fn get_label_success() {
+        let mut task = Task {
+            title: "target".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: None,
+            done: false,
+        };
+
+        assert_eq!(
+            task.get_label(),
+            vec![Label {
+                title: "label".to_string()
+            }]
+        );
+
+        task.label = None;
+        assert_eq!(task.get_label(), vec![]);
+    }
 }
