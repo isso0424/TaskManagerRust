@@ -166,10 +166,35 @@ mod tests {
         );
 
         assert_eq!(tasks.clone().search_with_title(None), tasks.clone());
-
         assert_eq!(
             tasks.clone().search_with_title(Some("invalid".to_string())),
             Tasks { content: vec![] }
         );
+    }
+
+    #[test]
+    fn search_with_label_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: Some(vec![Label {
+                    title: "label".to_string(),
+                }]),
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(
+            tasks.clone().search_with_label(Some("label".to_string())),
+            tasks.clone()
+        );
+
+        assert_eq!(
+            tasks.clone().search_with_label(Some("invalid".to_string())),
+            Tasks { content: vec![] }
+        );
+
+        assert_eq!(tasks.clone().search_with_label(None), tasks.clone());
     }
 }
