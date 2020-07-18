@@ -197,4 +197,16 @@ mod tests {
 
         assert_eq!(tasks.clone().search_with_label(None), tasks.clone());
     }
+
+    #[test]
+    fn get_title_test() {
+        let task = Task {
+            title: "target".to_string(),
+            label: None,
+            limit: None,
+            done: false,
+        };
+
+        assert_eq!(task.get_title(), task.title);
+    }
 }
