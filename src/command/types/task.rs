@@ -5,7 +5,7 @@ use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
 
-use chrono::{Local, TimeZone};
+use chrono::{TimeZone, Utc};
 
 use crate::command::types::label::Label;
 
@@ -120,7 +120,151 @@ impl Task {
     pub fn limit_to_string(&self) -> String {
         match self.get_limit() {
             0 => "なし".to_string(),
-            limit => Local.timestamp(limit, 0).to_string(),
+            limit => Utc.timestamp(limit, 0).to_string(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn get_index_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(Tasks::get_index("target".to_string(), &tasks).unwrap(), 0);
+    }
+
+    #[test]
+    fn get_index_failed() {
+        let tasks = Tasks { content: vec![] };
+
+        assert_eq!(Tasks::get_index("invalid".to_string(), &tasks).ok(), None);
+    }
+
+    #[test]
+    fn search_with_title_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(
+            tasks.clone().search_with_title(Some("target".to_string())),
+            tasks.clone()
+        );
+
+        assert_eq!(tasks.clone().search_with_title(None), tasks.clone());
+        assert_eq!(
+            tasks.clone().search_with_title(Some("invalid".to_string())),
+            Tasks { content: vec![] }
+        );
+    }
+
+    #[test]
+    fn search_with_label_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: Some(vec![Label {
+                    title: "label".to_string(),
+                }]),
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(
+            tasks.clone().search_with_label(Some("label".to_string())),
+            tasks.clone()
+        );
+
+        assert_eq!(
+            tasks.clone().search_with_label(Some("invalid".to_string())),
+            Tasks { content: vec![] }
+        );
+
+        assert_eq!(tasks.clone().search_with_label(None), tasks.clone());
+    }
+
+    #[test]
+    fn get_title_test() {
+        let task = Task {
+            title: "target".to_string(),
+            label: None,
+            limit: None,
+            done: false,
+        };
+
+        assert_eq!(task.get_title(), task.title);
+    }
+
+    #[test]
+    fn get_limit_success() {
+        let mut task = Task {
+            title: "target".to_string(),
+            label: None,
+            limit: Some(110000),
+            done: false,
+        };
+
+        assert_eq!(task.get_limit(), 110000);
+
+        task.limit = None;
+        assert_eq!(task.get_limit(), 0);
+    }
+
+    #[test]
+    fn get_label_success() {
+        let mut task = Task {
+            title: "target".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: None,
+            done: false,
+        };
+
+        assert_eq!(
+            task.get_label(),
+            vec![Label {
+                title: "label".to_string()
+            }]
+        );
+
+        task.label = None;
+        assert_eq!(task.get_label(), vec![]);
+    }
+
+    #[test]
+    fn limit_to_string_success() {
+        //
+        let mut task = Task {
+            title: "target".to_string(),
+            label: Some(vec![Label {
+                title: "label".to_string(),
+            }]),
+            limit: Some(944956800),
+            done: false,
+        };
+
+        assert_eq!(
+            task.limit_to_string(),
+            "1999-12-12 00:00:00 UTC".to_string()
+        );
+
+        task.limit = None;
+        assert_eq!(task.limit_to_string(), "なし".to_string());
     }
 }
