@@ -209,4 +209,19 @@ mod tests {
 
         assert_eq!(task.get_title(), task.title);
     }
+
+    #[test]
+    fn get_limit_success() {
+        let mut task = Task {
+            title: "target".to_string(),
+            label: None,
+            limit: Some(110000),
+            done: false,
+        };
+
+        assert_eq!(task.get_limit(), 110000);
+
+        task.limit = None;
+        assert_eq!(task.get_limit(), 0);
+    }
 }
