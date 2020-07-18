@@ -124,3 +124,28 @@ impl Task {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn get_index_success() {
+        let tasks = Tasks {
+            content: vec![Task {
+                title: "target".to_string(),
+                label: None,
+                limit: None,
+                done: false,
+            }],
+        };
+
+        assert_eq!(Tasks::get_index("target".to_string(), &tasks).unwrap(), 0);
+    }
+
+    #[test]
+    fn get_index_failed() {
+        let tasks = Tasks { content: vec![] };
+
+        assert_eq!(Tasks::get_index("invalid".to_string(), &tasks).ok(), None);
+    }
+}
