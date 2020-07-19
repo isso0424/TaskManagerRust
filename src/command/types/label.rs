@@ -26,20 +26,18 @@ impl Labels {
         Ok(label_json)
     }
 
+    fn is_exist(&self, target: &str) -> bool {
+        self.content.iter().any(|label| label.title == target)
+    }
+
     pub fn parse(raw_labels: Option<Vec<&str>>, all_labels: Labels) -> Option<Vec<Label>> {
         let labels = &mut vec![];
         raw_labels.as_ref()?;
-        for raw_label in match raw_labels {
-            Some(value) => value,
-            None => return None,
-        } {
-            if !all_labels
-                .content
-                .iter()
-                .any(|label| label.title == raw_label)
-            {
+        for raw_label in raw_labels.unwrap_or(vec![]) {
+            if !all_labels.is_exist(raw_label) {
                 continue;
             }
+
             labels.push(Label {
                 title: raw_label.to_string(),
             });
@@ -70,27 +68,26 @@ impl Labels {
     }
 
     pub fn search_with_title(mut self, title: Option<String>) -> Self {
-        let keyword = match title {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(title) = title {
+            let searched_labels = self
+                .content
+                .drain(..)
+                .filter(|label| label.title.contains(title.as_str()))
+                .collect();
 
-        let searched_labels = self
-            .content
-            .drain(..)
-            .filter(|label| label.title.contains(keyword.as_str()))
-            .collect();
-
-        Labels {
-            content: searched_labels,
+            return Labels {
+                content: searched_labels,
+            };
         }
+
+        self
     }
 
     pub fn create_label_vec(title_vec: &[&str], all_labels: Self) -> Option<Vec<Label>> {
         let mut labels = vec![];
 
         for title in title_vec {
-            if !all_labels.content.iter().any(|label| label.title == *title) {
+            if !all_labels.is_exist(title) {
                 return None;
             }
 
