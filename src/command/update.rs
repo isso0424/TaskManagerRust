@@ -19,10 +19,13 @@ fn regeneration_task(
         .unwrap();
 
     let index = Tasks::get_index(title, &tasks)?;
+
     let new_title = parse_arg::get_title(&args).unwrap_or(task.title.clone());
+
     let new_limit = parse_arg::get_limit(&args)
         .map(|limit| Some(limit))
         .unwrap_or(task.limit);
+
     let new_labels = parse_arg::get_label(&args)
         .map(|value| Labels::create_label_vec(&value, labels))
         .unwrap_or(task.label.clone());
@@ -38,14 +41,9 @@ fn regeneration_task(
 }
 
 fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
-    let all_labels = match Labels::load() {
-        Ok(labels) => labels,
-        Err(_) => Labels { content: vec![] },
-    };
-    let tasks = match Tasks::load() {
-        Ok(tasks) => regeneration_task(title, args, tasks, all_labels)?,
-        Err(err) => return Err(err.to_string()),
-    };
+    let all_labels = Labels::load().unwrap_or(Labels { content: vec![] });
+    let tasks = Tasks::load().map_err(|err| err.to_string())?;
+    let tasks = regeneration_task(title, args, tasks, all_labels)?;
 
     tasks.save().map_err(|err| err.to_string())?;
     Ok(())
