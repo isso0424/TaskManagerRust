@@ -33,7 +33,7 @@ impl Labels {
     pub fn parse(&self, raw_labels: Option<Vec<&str>>) -> Option<Vec<Label>> {
         let labels = &mut vec![];
         raw_labels.as_ref()?;
-        for raw_label in raw_labels.unwrap_or(vec![]) {
+        for raw_label in raw_labels.unwrap_or_default() {
             if !self.is_exist(raw_label) {
                 continue;
             }

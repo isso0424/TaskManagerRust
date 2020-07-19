@@ -20,15 +20,13 @@ fn regeneration_task(
 
     let index = tasks.get_index(title)?;
 
-    let new_title = parse_arg::get_title(&args).unwrap_or(task.title.clone());
+    let new_title = parse_arg::get_title(&args).unwrap_or_else(|| task.title.clone());
 
-    let new_limit = parse_arg::get_limit(&args)
-        .map(|limit| Some(limit))
-        .unwrap_or(task.limit);
+    let new_limit = parse_arg::get_limit(&args).map_or(task.limit, |limit| Some(limit));
 
     let new_labels = parse_arg::get_label(&args)
         .map(|value| labels.create_label_vec(&value))
-        .unwrap_or(task.label.clone());
+        .unwrap_or_else(|| task.label.clone());
 
     tasks.content[index] = Task {
         title: new_title,

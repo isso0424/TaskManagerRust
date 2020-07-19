@@ -58,7 +58,7 @@ fn get_notifies(tasks: &Tasks) -> Vec<String> {
             }
             let task_title = &task.title;
             let task_limit: String = task.limit_to_string();
-            let task_labels = task.label.clone().unwrap_or(vec![]);
+            let task_labels = task.label.clone().unwrap_or_default();
 
             let mut label_string = "".to_string();
 
