@@ -1,6 +1,6 @@
+use crate::args::parse_arg;
 use crate::command::types::label::Labels;
 use crate::command::types::task::{Task, Tasks};
-use crate::config::parse_arg;
 
 fn regeneration_task(
     title: String,

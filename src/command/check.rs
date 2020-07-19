@@ -1,5 +1,5 @@
+use crate::args::parse_arg;
 use crate::command::types::{label::Labels, task::Tasks};
-use crate::config::parse_arg;
 
 fn create_labels(labels: Labels, keyword: Option<String>) -> String {
     if labels.content.is_empty() {

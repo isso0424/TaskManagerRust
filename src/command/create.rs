@@ -3,7 +3,7 @@ use crate::command::types::{
     task::{Task, Tasks},
 };
 
-use crate::config::parse_arg::{get_label, get_limit};
+use crate::args::parse_arg::{get_label, get_limit};
 
 fn update_label(mut labels: Labels, title: &str) -> Result<Labels, String> {
     if labels.content.iter().any(|x| x.title == title) {
