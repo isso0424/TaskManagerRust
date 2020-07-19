@@ -99,28 +99,10 @@ impl Tasks {
 }
 
 impl Task {
-    pub fn get_title(&self) -> String {
-        self.title.clone()
-    }
-
-    pub fn get_limit(&self) -> i64 {
-        match self.limit {
-            Some(limit) => limit,
-            None => 0,
-        }
-    }
-
-    pub fn get_label(&self) -> Vec<Label> {
-        match &self.label {
-            Some(labels) => labels.clone(),
-            None => vec![],
-        }
-    }
-
     pub fn limit_to_string(&self) -> String {
-        match self.get_limit() {
-            0 => "なし".to_string(),
-            limit => Utc.timestamp(limit, 0).to_string(),
+        match self.limit {
+            None => "なし".to_string(),
+            Some(limit) => Utc.timestamp(limit, 0).to_string(),
         }
     }
 }
@@ -196,55 +178,6 @@ mod tests {
         );
 
         assert_eq!(tasks.clone().search_with_label(None), tasks.clone());
-    }
-
-    #[test]
-    fn get_title_test() {
-        let task = Task {
-            title: "target".to_string(),
-            label: None,
-            limit: None,
-            done: false,
-        };
-
-        assert_eq!(task.get_title(), task.title);
-    }
-
-    #[test]
-    fn get_limit_success() {
-        let mut task = Task {
-            title: "target".to_string(),
-            label: None,
-            limit: Some(110000),
-            done: false,
-        };
-
-        assert_eq!(task.get_limit(), 110000);
-
-        task.limit = None;
-        assert_eq!(task.get_limit(), 0);
-    }
-
-    #[test]
-    fn get_label_success() {
-        let mut task = Task {
-            title: "target".to_string(),
-            label: Some(vec![Label {
-                title: "label".to_string(),
-            }]),
-            limit: None,
-            done: false,
-        };
-
-        assert_eq!(
-            task.get_label(),
-            vec![Label {
-                title: "label".to_string()
-            }]
-        );
-
-        task.label = None;
-        assert_eq!(task.get_label(), vec![]);
     }
 
     #[test]

@@ -42,7 +42,7 @@ fn get_done_notifies(tasks: &Tasks) -> Vec<String> {
             if !task.done {
                 return "".to_string();
             }
-            let task_title = task.get_title();
+            let task_title = &task.title;
             format!("タスク名:{}\n\n", task_title)
         })
         .collect()
@@ -56,9 +56,9 @@ fn get_notifies(tasks: &Tasks) -> Vec<String> {
             if task.done {
                 return "".to_string();
             }
-            let task_title = task.get_title();
+            let task_title = &task.title;
             let task_limit: String = task.limit_to_string();
-            let task_labels = task.get_label();
+            let task_labels = task.label.clone().unwrap_or(vec![]);
 
             let mut label_string = "".to_string();
 
