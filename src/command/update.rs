@@ -18,7 +18,7 @@ fn regeneration_task(
         .find(|task| task.title == title)
         .unwrap();
 
-    let index = Tasks::get_index(title, &tasks)?;
+    let index = tasks.get_index(title)?;
 
     let new_title = parse_arg::get_title(&args).unwrap_or(task.title.clone());
 

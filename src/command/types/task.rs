@@ -50,8 +50,8 @@ impl Tasks {
         Ok(())
     }
 
-    pub fn get_index(title: String, tasks: &Tasks) -> Result<usize, String> {
-        for (i, task) in tasks.content.iter().enumerate() {
+    pub fn get_index(&self, title: String) -> Result<usize, String> {
+        for (i, task) in self.content.iter().enumerate() {
             if task.title == title {
                 return Ok(i);
             }
@@ -119,14 +119,14 @@ mod tests {
             }],
         };
 
-        assert_eq!(Tasks::get_index("target".to_string(), &tasks).unwrap(), 0);
+        assert_eq!(tasks.get_index("target".to_string()).unwrap(), 0);
     }
 
     #[test]
     fn get_index_failed() {
         let tasks = Tasks { content: vec![] };
 
-        assert_eq!(Tasks::get_index("invalid".to_string(), &tasks).ok(), None);
+        assert_eq!(tasks.get_index("invalid".to_string()).ok(), None);
     }
 
     #[test]
