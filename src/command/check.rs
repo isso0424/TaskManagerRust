@@ -1,5 +1,5 @@
+use crate::args::parse_arg;
 use crate::command::types::{label::Labels, task::Tasks};
-use crate::config::parse_arg;
 
 fn create_labels(labels: Labels, keyword: Option<String>) -> String {
     if labels.content.is_empty() {
@@ -42,7 +42,7 @@ fn get_done_notifies(tasks: &Tasks) -> Vec<String> {
             if !task.done {
                 return "".to_string();
             }
-            let task_title = task.get_title();
+            let task_title = &task.title;
             format!("タスク名:{}\n\n", task_title)
         })
         .collect()
@@ -56,9 +56,9 @@ fn get_notifies(tasks: &Tasks) -> Vec<String> {
             if task.done {
                 return "".to_string();
             }
-            let task_title = task.get_title();
+            let task_title = &task.title;
             let task_limit: String = task.limit_to_string();
-            let task_labels = task.get_label();
+            let task_labels = task.label.clone().unwrap_or_default();
 
             let mut label_string = "".to_string();
 

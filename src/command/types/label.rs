@@ -26,20 +26,18 @@ impl Labels {
         Ok(label_json)
     }
 
-    pub fn parse(raw_labels: Option<Vec<&str>>, all_labels: Labels) -> Option<Vec<Label>> {
+    fn is_exist(&self, target: &str) -> bool {
+        self.content.iter().any(|label| label.title == target)
+    }
+
+    pub fn parse(&self, raw_labels: Option<Vec<&str>>) -> Option<Vec<Label>> {
         let labels = &mut vec![];
         raw_labels.as_ref()?;
-        for raw_label in match raw_labels {
-            Some(value) => value,
-            None => return None,
-        } {
-            if !all_labels
-                .content
-                .iter()
-                .any(|label| label.title == raw_label)
-            {
+        for raw_label in raw_labels.unwrap_or_default() {
+            if !self.is_exist(raw_label) {
                 continue;
             }
+
             labels.push(Label {
                 title: raw_label.to_string(),
             });
@@ -70,27 +68,26 @@ impl Labels {
     }
 
     pub fn search_with_title(mut self, title: Option<String>) -> Self {
-        let keyword = match title {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(title) = title {
+            let searched_labels = self
+                .content
+                .drain(..)
+                .filter(|label| label.title.contains(title.as_str()))
+                .collect();
 
-        let searched_labels = self
-            .content
-            .drain(..)
-            .filter(|label| label.title.contains(keyword.as_str()))
-            .collect();
-
-        Labels {
-            content: searched_labels,
+            return Labels {
+                content: searched_labels,
+            };
         }
+
+        self
     }
 
-    pub fn create_label_vec(title_vec: &[&str], all_labels: Self) -> Option<Vec<Label>> {
+    pub fn create_label_vec(&self, title_vec: &[&str]) -> Option<Vec<Label>> {
         let mut labels = vec![];
 
         for title in title_vec {
-            if !all_labels.content.iter().any(|label| label.title == *title) {
+            if !self.is_exist(title) {
                 return None;
             }
 
@@ -116,7 +113,7 @@ mod tests {
         };
 
         assert_eq!(
-            Labels::parse(Some(vec!["label"]), labels).unwrap(),
+            labels.parse(Some(vec!["label"])).unwrap(),
             vec![Label {
                 title: "label".to_string()
             }]
@@ -131,8 +128,8 @@ mod tests {
             }],
         };
 
-        assert_eq!(Labels::parse(Some(vec!["invalid"]), labels.clone()), None);
-        assert_eq!(Labels::parse(None, labels), None);
+        assert_eq!(labels.parse(Some(vec!["invalid"])), None);
+        assert_eq!(labels.parse(None), None);
     }
 
     #[test]
@@ -170,7 +167,7 @@ mod tests {
         };
 
         assert_eq!(
-            Labels::create_label_vec(&vec!["label1", "label3"], labels).unwrap(),
+            labels.create_label_vec(&vec!["label1", "label3"]).unwrap(),
             vec![
                 Label {
                     title: "label1".to_string()
@@ -190,6 +187,6 @@ mod tests {
             }],
         };
 
-        assert_eq!(Labels::create_label_vec(&vec!["invalid"], labels), None);
+        assert_eq!(labels.create_label_vec(&vec!["invalid"]), None);
     }
 }

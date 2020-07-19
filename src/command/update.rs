@@ -1,6 +1,6 @@
+use crate::args::parse_arg;
 use crate::command::types::label::Labels;
 use crate::command::types::task::{Task, Tasks};
-use crate::config::parse_arg;
 
 fn regeneration_task(
     title: String,
@@ -18,19 +18,18 @@ fn regeneration_task(
         .find(|task| task.title == title)
         .unwrap();
 
-    let index = Tasks::get_index(title, &tasks)?;
-    let new_title = match parse_arg::get_title(&args) {
-        Some(value) => value,
-        None => task.get_title(),
-    };
+    let index = tasks.get_index(title)?;
+
+    let new_title = parse_arg::get_title(&args).unwrap_or_else(|| task.title.clone());
+
     let new_limit = match parse_arg::get_limit(&args) {
-        Some(value) => Some(value),
+        Some(limit) => Some(limit),
         None => task.limit,
     };
-    let new_labels = match &parse_arg::get_label(&args) {
-        Some(value) => Labels::create_label_vec(value, labels),
-        None => task.label.clone(),
-    };
+
+    let new_labels = parse_arg::get_label(&args)
+        .map(|value| labels.create_label_vec(&value))
+        .unwrap_or_else(|| task.label.clone());
 
     tasks.content[index] = Task {
         title: new_title,
@@ -43,14 +42,9 @@ fn regeneration_task(
 }
 
 fn update_task(title: String, args: Vec<String>) -> Result<(), String> {
-    let all_labels = match Labels::load() {
-        Ok(labels) => labels,
-        Err(_) => Labels { content: vec![] },
-    };
-    let tasks = match Tasks::load() {
-        Ok(tasks) => regeneration_task(title, args, tasks, all_labels)?,
-        Err(err) => return Err(err.to_string()),
-    };
+    let all_labels = Labels::load().unwrap_or(Labels { content: vec![] });
+    let tasks = Tasks::load().map_err(|err| err.to_string())?;
+    let tasks = regeneration_task(title, args, tasks, all_labels)?;
 
     tasks.save().map_err(|err| err.to_string())?;
     Ok(())

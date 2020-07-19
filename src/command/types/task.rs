@@ -50,8 +50,8 @@ impl Tasks {
         Ok(())
     }
 
-    pub fn get_index(title: String, tasks: &Tasks) -> Result<usize, String> {
-        for (i, task) in tasks.content.iter().enumerate() {
+    pub fn get_index(&self, title: String) -> Result<usize, String> {
+        for (i, task) in self.content.iter().enumerate() {
             if task.title == title {
                 return Ok(i);
             }
@@ -61,66 +61,46 @@ impl Tasks {
     }
 
     pub fn search_with_title(mut self, title: Option<String>) -> Self {
-        let keyword = match title {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(keyword) = title {
+            let searched_tasks = self
+                .content
+                .drain(..)
+                .filter(|task| task.title.contains(keyword.as_str()))
+                .collect();
 
-        let searched_tasks = self
-            .content
-            .drain(..)
-            .filter(|task| task.title.contains(keyword.as_str()))
-            .collect();
-
-        Tasks {
-            content: searched_tasks,
+            return Tasks {
+                content: searched_tasks,
+            };
         }
+
+        self
     }
 
     pub fn search_with_label(mut self, target_label: Option<String>) -> Self {
-        let keyword = match target_label {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(keyword) = target_label {
+            let searched_tasks = self
+                .content
+                .drain(..)
+                .filter(|task| match &task.label {
+                    Some(task) => task.iter().any(|label| label.title == keyword),
+                    None => false,
+                })
+                .collect();
 
-        let searched_tasks = self
-            .content
-            .drain(..)
-            .filter(|task| match &task.label {
-                Some(task) => task.iter().any(|label| label.title == keyword),
-                None => false,
-            })
-            .collect();
-
-        Tasks {
-            content: searched_tasks,
+            return Tasks {
+                content: searched_tasks,
+            };
         }
+
+        self
     }
 }
 
 impl Task {
-    pub fn get_title(&self) -> String {
-        self.title.clone()
-    }
-
-    pub fn get_limit(&self) -> i64 {
-        match self.limit {
-            Some(limit) => limit,
-            None => 0,
-        }
-    }
-
-    pub fn get_label(&self) -> Vec<Label> {
-        match &self.label {
-            Some(labels) => labels.clone(),
-            None => vec![],
-        }
-    }
-
     pub fn limit_to_string(&self) -> String {
-        match self.get_limit() {
-            0 => "なし".to_string(),
-            limit => Utc.timestamp(limit, 0).to_string(),
+        match self.limit {
+            None => "なし".to_string(),
+            Some(limit) => Utc.timestamp(limit, 0).to_string(),
         }
     }
 }
@@ -139,14 +119,14 @@ mod tests {
             }],
         };
 
-        assert_eq!(Tasks::get_index("target".to_string(), &tasks).unwrap(), 0);
+        assert_eq!(tasks.get_index("target".to_string()).unwrap(), 0);
     }
 
     #[test]
     fn get_index_failed() {
         let tasks = Tasks { content: vec![] };
 
-        assert_eq!(Tasks::get_index("invalid".to_string(), &tasks).ok(), None);
+        assert_eq!(tasks.get_index("invalid".to_string()).ok(), None);
     }
 
     #[test]
@@ -196,55 +176,6 @@ mod tests {
         );
 
         assert_eq!(tasks.clone().search_with_label(None), tasks.clone());
-    }
-
-    #[test]
-    fn get_title_test() {
-        let task = Task {
-            title: "target".to_string(),
-            label: None,
-            limit: None,
-            done: false,
-        };
-
-        assert_eq!(task.get_title(), task.title);
-    }
-
-    #[test]
-    fn get_limit_success() {
-        let mut task = Task {
-            title: "target".to_string(),
-            label: None,
-            limit: Some(110000),
-            done: false,
-        };
-
-        assert_eq!(task.get_limit(), 110000);
-
-        task.limit = None;
-        assert_eq!(task.get_limit(), 0);
-    }
-
-    #[test]
-    fn get_label_success() {
-        let mut task = Task {
-            title: "target".to_string(),
-            label: Some(vec![Label {
-                title: "label".to_string(),
-            }]),
-            limit: None,
-            done: false,
-        };
-
-        assert_eq!(
-            task.get_label(),
-            vec![Label {
-                title: "label".to_string()
-            }]
-        );
-
-        task.label = None;
-        assert_eq!(task.get_label(), vec![]);
     }
 
     #[test]

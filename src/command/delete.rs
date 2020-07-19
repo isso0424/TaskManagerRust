@@ -15,10 +15,8 @@ fn update_task(mut tasks: Tasks, title: String) -> Result<Tasks, String> {
 }
 
 fn delete_task(title: String) -> Result<(), String> {
-    let tasks = match Tasks::load() {
-        Ok(tasks) => update_task(tasks, title)?,
-        Err(err) => return Err(err.to_string()),
-    };
+    let tasks = Tasks::load().map_err(|err| err.to_string())?;
+    let tasks = update_task(tasks, title)?;
 
     tasks.save().map_err(|err| err.to_string())?;
 
