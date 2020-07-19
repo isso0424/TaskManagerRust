@@ -22,7 +22,10 @@ fn regeneration_task(
 
     let new_title = parse_arg::get_title(&args).unwrap_or_else(|| task.title.clone());
 
-    let new_limit = parse_arg::get_limit(&args).map_or(task.limit, |limit| Some(limit));
+    let new_limit = match parse_arg::get_limit(&args) {
+        Some(limit) => Some(limit),
+        None => task.limit,
+    };
 
     let new_labels = parse_arg::get_label(&args)
         .map(|value| labels.create_label_vec(&value))
