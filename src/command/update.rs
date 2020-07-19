@@ -27,7 +27,7 @@ fn regeneration_task(
         .unwrap_or(task.limit);
 
     let new_labels = parse_arg::get_label(&args)
-        .map(|value| Labels::create_label_vec(&value, labels))
+        .map(|value| labels.create_label_vec(&value))
         .unwrap_or(task.label.clone());
 
     tasks.content[index] = Task {

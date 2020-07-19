@@ -46,7 +46,7 @@ fn update_task<'a>(
 
     let new_task = Task {
         title: title.to_string(),
-        label: Labels::parse(label, all_labels),
+        label: all_labels.parse(label),
         limit,
         done: false,
     };
