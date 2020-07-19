@@ -27,10 +27,8 @@ fn update_task(mut tasks: Tasks, title: String) -> Result<Tasks, String> {
 }
 
 fn mark_done_task(task_title: String) -> Result<(), String> {
-    let tasks = match Tasks::load() {
-        Ok(tasks) => update_task(tasks, task_title)?,
-        Err(err) => return Err(err.to_string()),
-    };
+    let tasks = Tasks::load().map_err(|err| err.to_string())?;
+    let tasks = update_task(tasks, task_title)?;
 
     tasks.save().map_err(|err| err.to_string())?;
 
@@ -38,8 +36,8 @@ fn mark_done_task(task_title: String) -> Result<(), String> {
 }
 
 pub fn done(args: Vec<String>) -> Result<(), String> {
-    let target_title = &args[2];
-    mark_done_task(target_title.clone())?;
+    let target_title = args[2].clone();
+    mark_done_task(target_title)?;
 
     Ok(())
 }
