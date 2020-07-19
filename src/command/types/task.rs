@@ -61,40 +61,38 @@ impl Tasks {
     }
 
     pub fn search_with_title(mut self, title: Option<String>) -> Self {
-        let keyword = match title {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(keyword) = title {
+            let searched_tasks = self
+                .content
+                .drain(..)
+                .filter(|task| task.title.contains(keyword.as_str()))
+                .collect();
 
-        let searched_tasks = self
-            .content
-            .drain(..)
-            .filter(|task| task.title.contains(keyword.as_str()))
-            .collect();
-
-        Tasks {
-            content: searched_tasks,
+            return Tasks {
+                content: searched_tasks,
+            };
         }
+
+        self
     }
 
     pub fn search_with_label(mut self, target_label: Option<String>) -> Self {
-        let keyword = match target_label {
-            Some(v) => v,
-            None => return self,
-        };
+        if let Some(keyword) = target_label {
+            let searched_tasks = self
+                .content
+                .drain(..)
+                .filter(|task| match &task.label {
+                    Some(task) => task.iter().any(|label| label.title == keyword),
+                    None => false,
+                })
+                .collect();
 
-        let searched_tasks = self
-            .content
-            .drain(..)
-            .filter(|task| match &task.label {
-                Some(task) => task.iter().any(|label| label.title == keyword),
-                None => false,
-            })
-            .collect();
-
-        Tasks {
-            content: searched_tasks,
+            return Tasks {
+                content: searched_tasks,
+            };
         }
+
+        self
     }
 }
 
