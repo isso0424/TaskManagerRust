@@ -2,11 +2,12 @@ use std::env;
 #[macro_use]
 extern crate log;
 
+mod args;
 mod command;
-mod config;
+mod setup;
 
 fn execute(args: Vec<String>) -> Result<(), String> {
-    config::file::create_data_json()?;
+    setup::file::create_data_json()?;
 
     let command_name = &args[1];
 
@@ -28,7 +29,7 @@ fn execute(args: Vec<String>) -> Result<(), String> {
 
 fn main() {
     let raw_args: Vec<String> = env::args().collect();
-    let args = match config::check_args::check_args(raw_args) {
+    let args = match args::check_args::check_args(raw_args) {
         Ok(arg) => arg,
         Err(error) => {
             error!("{}", error);
